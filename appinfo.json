@@ -5,7 +5,8 @@
     "DISPLAY_MODE": 15,
     "THEME": 16,
     "SHOW_STATUS": 17,
-    "MUSIC_ENABLED": 18
+    "MUSIC_ENABLED": 18,
+    "VIBRATE_THEME": 19
   },
   "capabilities": [
     "configurable"

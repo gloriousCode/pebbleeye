@@ -8,6 +8,7 @@ typedef struct {
   bool analogue_seconds;
   bool show_status;
   bool music_enabled;
+  bool vibrate_theme;
 } Settings;
 
 Settings settings_defaults(void);

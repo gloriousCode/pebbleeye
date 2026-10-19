@@ -32,6 +32,10 @@ bool settings_apply(Settings *settings, int key, int value) {
       if (value != 0 && value != 1) return false;
       settings->music_enabled = value != 0;
       return true;
+    case 19:
+      if (value != 0 && value != 1) return false;
+      settings->vibrate_theme = value != 0;
+      return true;
     default: return false;
   }
 }

@@ -14,6 +14,10 @@ test:
 	./build/theme_audio_test
 	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_GABBRO -Itests/stubs -Isrc tests/theme_audio_test.c -o build/theme_audio_gabbro_test
 	./build/theme_audio_gabbro_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_GABBRO -Itests/stubs -Isrc tests/theme_vibes_test.c -o build/theme_vibes_test
+	./build/theme_vibes_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_EMERY -Itests/stubs -Isrc tests/theme_vibes_test.c -o build/theme_vibes_emery_test
+	./build/theme_vibes_emery_test
 	node --test tests/configuration_test.js
 	$(CC) -std=c99 -Wall -Wextra -Werror -Itests/smooth_font_stubs -Isrc tests/smooth_font_renderer_test.c -o build/smooth_font_renderer_test
 	./build/smooth_font_renderer_test

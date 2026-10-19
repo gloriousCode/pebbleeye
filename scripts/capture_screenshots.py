@@ -137,6 +137,7 @@ def capture(platform):
                ("disconnected", {7:2, 14:0, 15:2, 16:0, 17:1}, 10, 8, True, False)]
     for name, settings, hour, minute, use_24h, connected in scenes:
         settings[18] = 0  # Keep promotional captures silent and deterministic.
+        settings[19] = 0  # Disable optional haptics during captures.
         stamp = datetime(2026, 10, 19, hour, minute, 10, tzinfo=timezone.utc)
         pebble.send_packet(TimeMessage(message=SetUTC(unix_time=int(stamp.timestamp()), utc_offset=0, tz_name="UTC")))
         pebble.transport.send_packet(QemuTimeFormat(is_24_hour=use_24h), MessageTargetQemu())

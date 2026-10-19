@@ -25,6 +25,8 @@ Orchid, Lagoon, Ember, Silver and Rose.
   face updates on minute ticks and settings/status events.
 - Optional 12-second theme on a double tap of the watch, on Time 2 only. Off by
   default; respects mute and Quiet Time. Round 2 has no speaker.
+- Optional three-second vibration rhythm on a double tap, on Round 2 only.
+  Off by default; respects Quiet Time.
 - Watch system 12-hour or 24-hour preference.
 - Mobile settings with illustrative preview, Undo, Save and Cancel.
 - Validated settings, preserved preferences and bounded delivery retries.
@@ -104,3 +106,16 @@ and repeated taps do not restart an active clip. Disable the option to stop it.
 
 Round 2 has no speaker, so this setting does not enable audio on that model.
 Physical speaker quality and real-world tap sensitivity require a Time 2 device.
+
+## Round 2 vibration theme
+
+Enable **Vibrate theme (Round 2 only)** to play a three-second rhythm when you
+tap the watch twice. Seven brief pulses follow prominent beats from the approved
+audio excerpt; this reproduces timing, not musical pitch. Round 2 still contains
+no audio resource. The option is independent of Time 2 music and defaults to off.
+
+Quiet Time prevents the pattern from starting and stops an active pattern.
+Switching the option off also cancels it. Taps during the pattern and a short
+settling interval are ignored so motor vibrations cannot immediately retrigger
+it. No vibration timer or tap subscription runs while the option is disabled.
+Actual feel and tap sensitivity require checking on a physical Round 2.

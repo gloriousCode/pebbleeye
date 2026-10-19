@@ -11,3 +11,6 @@ by default.
 
 Time 2 adds optional double-tap theme playback, disabled by default and respecting
 mute and Quiet Time. Round 2 has no speaker and does not include the audio.
+
+Round 2 adds an optional three-second vibration rhythm on double tap. It defaults
+to off, respects Quiet Time and ignores taps while the pattern is running.

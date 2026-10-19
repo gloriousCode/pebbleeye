@@ -85,3 +85,7 @@ uint32_t speaker_stream_write(const void *data, uint32_t count);
 void speaker_stream_close(void);
 void speaker_stop(void);
 void speaker_set_finish_callback(SpeakerFinishedCallback callback, void *context);
+
+typedef struct { const uint32_t *durations; uint32_t num_segments; } VibePattern;
+void vibes_enqueue_custom_pattern(VibePattern pattern);
+void vibes_cancel(void);

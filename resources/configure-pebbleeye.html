@@ -35,6 +35,7 @@
 <section class="card" aria-labelledby="details-heading"><h2 id="details-heading">Finishing touches</h2>
 <label class="toggle" for="analogue_seconds"><input id="analogue_seconds" name="analogue_seconds" type="checkbox"><span>Seconds hand<small id="seconds-help">Shown with analogue hands while the backlight is on. Off saves extra screen updates.</small></span></label>
 <label class="toggle" for="music_enabled"><input id="music_enabled" name="music_enabled" type="checkbox"><span>Double-tap music (Time 2 only)<small>Play the 12-second theme when you tap the watch twice. Respects mute and Quiet Time. Round 2 has no speaker.</small></span></label>
+<label class="toggle" for="vibrate_theme"><input id="vibrate_theme" name="vibrate_theme" type="checkbox"><span>Vibrate theme (Round 2 only)<small>Tap twice for a short rhythmic vibration. Off by default and respects Quiet Time. Plays a rhythm, not a melody.</small></span></label>
 <label class="toggle" for="show_status"><input id="show_status" name="show_status" type="checkbox" checked><span>Watch status<small>Show battery and phone connection information.</small></span></label>
 </section>
 <p id="edit-status" role="status" aria-live="polite">Settings ready.</p>
@@ -42,7 +43,7 @@
 <div class="actions"><button id="cancel" type="button">Cancel</button><button type="submit">Save to watch</button></div>
 </form></main>
 <script>
-var defaults = {date_format:"dd_mm_yy",display_mode:"digital",theme:"classic",analogue_seconds:false,show_status:true,music_enabled:false};
+var defaults = {date_format:"dd_mm_yy",display_mode:"digital",theme:"classic",analogue_seconds:false,show_status:true,music_enabled:false,vibrate_theme:false};
 var choices = {date_format:["dd_mm_yy","mm_dd_yyyy","mon_d_aug","dd_slash_mm","mm_slash_dd"],display_mode:["digital","analogue","combined"],theme:["classic","amber","ice","orchid","lagoon","ember","silver","rose"]};
 var paletteColours = {
   classic:{bright:"#aaffaa",muted:"#00aa00",panel:"#005500"},

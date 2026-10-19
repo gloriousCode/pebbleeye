@@ -5,6 +5,9 @@
 #include "../src/main.c"
 #undef main
 
+static bool vibes_enabled;
+void theme_vibes_set_enabled(bool enabled) { vibes_enabled = enabled; }
+void theme_vibes_deinit(void) { vibes_enabled = false; }
 static bool audio_enabled;
 void theme_audio_set_enabled(bool enabled) { audio_enabled = enabled; }
 void theme_audio_deinit(void) { audio_enabled = false; }
@@ -13,8 +16,8 @@ static Window fake_window;
 static Layer root_layer, face_layer;
 static WindowHandlers handlers;
 static SpyFaceState rendered;
-static bool saved[19], saved_bool[19], initial_light, fail_window, fail_face;
-static int saved_int[19], bool_reads, int_reads, bool_writes, int_writes;
+static bool saved[20], saved_bool[20], initial_light, fail_window, fail_face;
+static int saved_int[20], bool_reads, int_reads, bool_writes, int_writes;
 static int renders, subscriptions, destroyed_faces, destroyed_windows, children;
 static TimeUnits active_units;
 static void (*tick_handler)(struct tm *, TimeUnits);
@@ -30,11 +33,11 @@ bool clock_is_24h_style(void) { return true; }
 bool light_is_on(void) { return initial_light; }
 Tuple *dict_read_first(DictionaryIterator *it) { it->position = 0; return it->count ? &it->tuples[0] : NULL; }
 Tuple *dict_read_next(DictionaryIterator *it) { return ++it->position < it->count ? &it->tuples[it->position] : NULL; }
-bool persist_exists(int key) { assert(key >= 0 && key < 19); return saved[key]; }
-bool persist_read_bool(int key) { assert(key == 14 || key == 17 || key == 18); ++bool_reads; return saved_bool[key]; }
-int persist_read_int(int key) { assert(key != 14 && key != 17 && key != 18); ++int_reads; return saved_int[key]; }
-int persist_write_bool(int key, bool value) { assert(key == 14 || key == 17 || key == 18); ++bool_writes; saved_bool[key] = value; saved[key] = true; return 1; }
-int persist_write_int(int key, int value) { assert(key != 14 && key != 17 && key != 18); ++int_writes; saved_int[key] = value; saved[key] = true; return 4; }
+bool persist_exists(int key) { assert(key >= 0 && key < 20); return saved[key]; }
+bool persist_read_bool(int key) { assert(key == 14 || key == 17 || key == 18 || key == 19); ++bool_reads; return saved_bool[key]; }
+int persist_read_int(int key) { assert(key != 14 && key != 17 && key != 18 && key != 19); ++int_reads; return saved_int[key]; }
+int persist_write_bool(int key, bool value) { assert(key == 14 || key == 17 || key == 18 || key == 19); ++bool_writes; saved_bool[key] = value; saved[key] = true; return 1; }
+int persist_write_int(int key, int value) { assert(key != 14 && key != 17 && key != 18 && key != 19); ++int_writes; saved_int[key] = value; saved[key] = true; return 4; }
 Window *window_create(void) { return fail_window ? NULL : &fake_window; }
 void window_destroy(Window *w) { assert(w == &fake_window); ++destroyed_windows; handlers.unload(w); }
 void window_set_background_color(Window *w, int colour) { assert(w && colour == GColorBlack); }
@@ -144,6 +147,12 @@ int main(void) {
   send_value(18, 0); assert(!audio_enabled && !settings.music_enabled && bool_writes == 1);
   send_value(18, 2); assert(!audio_enabled && bool_writes == 1);
   send_value(18, 1); assert(audio_enabled); deinit(); assert(!audio_enabled);
+  reset(); init(); assert(!vibes_enabled && !settings.vibrate_theme); deinit();
+  reset(); saved[19] = saved_bool[19] = true; init();
+  assert(vibes_enabled && settings.vibrate_theme && bool_reads == 1);
+  send_value(19, 0); assert(!vibes_enabled && !settings.vibrate_theme && bool_writes == 1);
+  send_value(19, -1); send_value(19, 2); assert(!vibes_enabled && bool_writes == 1);
+  send_value(19, 1); assert(vibes_enabled); deinit(); assert(!vibes_enabled);
   puts("Runtime settings, tick subscription and lifecycle tests passed");
   return 0;
 }
