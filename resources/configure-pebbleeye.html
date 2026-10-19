@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>PebbleEye settings</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101713;color:#eef7ef;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:600px;margin:auto;padding:24px 20px 0}h1{font-size:32px;letter-spacing:-1px;margin:0}h2{font-size:19px;margin:0 0 16px}p{color:#b9c9bd;margin:8px 0 20px}.eyebrow{font:12px monospace;letter-spacing:2px;color:#aaffaa;margin:0 0 8px}.card{background:#1a251e;border:1px solid #354b3b;border-radius:18px;padding:20px;margin:20px 0}label{display:block;font-weight:600;margin-bottom:8px}select,button{font:inherit;min-height:48px;border-radius:10px;border:1px solid #58735e;padding:10px 12px}select{width:100%;background:#101713;color:#eef7ef;margin-bottom:8px}small{display:block;color:#b9c9bd;font-size:14px}.field+.field{margin-top:24px}.toggle{display:flex;gap:12px;align-items:flex-start;min-height:48px;cursor:pointer}.toggle input{width:24px;height:24px;flex-shrink:0;accent-color:#aaffaa;margin:2px 0}.toggle small{font-weight:400;margin-top:4px}.actions{position:sticky;bottom:0;background:#101713;padding:16px 0;padding-bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:12px}.actions button{flex:1;background:transparent;color:#eef7ef}.actions button[type=submit]{background:#aaffaa;color:#102515;border-color:#aaffaa;font-weight:700}:focus-visible{outline:3px solid #ffffaa;outline-offset:4px}#preview{display:block;width:200px;height:200px;margin:auto}#preview-caption{text-align:center;font-size:13px;margin:12px 0 0}.preview-card{background:#050805}#edit-status{font-size:14px;min-height:21px;margin:0;color:#aaffaa}button:disabled{opacity:.5}#undo{background:none;border:0;padding:0;color:#aaffaa;text-decoration:underline;min-height:44px} .muted{opacity:.6}
+</style>
+</head>
+<body><main>
+<p class="eyebrow">PEBBLE TIME 2 · PEBBLE ROUND 2</p>
+<h1>Make it your mission.</h1>
+<p>Tune your PebbleEye display. Changes reach your watch when you save.</p>
+<div class="card preview-card">
+<svg id="preview" viewBox="0 0 200 200" role="img" aria-label="Illustrative watch display preview">
+<circle cx="100" cy="100" r="94" fill="#000" stroke="#555" stroke-width="2"/>
+<g id="preview-ink" fill="#aaffaa" stroke="#aaffaa">
+<path d="M35 55 A78 78 0 0 0 35 145 M165 55 A78 78 0 0 1 165 145" fill="none" stroke-width="7"/>
+<g id="preview-hands" stroke-width="3" stroke-linecap="round"><path d="M100 100 L74 69 M100 100 L133 62"/><circle cx="100" cy="100" r="3"/></g>
+<path id="preview-seconds" d="M100 100 L128 146" stroke-width="1"/>
+<rect id="preview-time-backing" x="65" y="110" width="70" height="21" rx="3" fill="#000" stroke="none"/>
+<text id="preview-time" x="100" y="108" text-anchor="middle" font-family="monospace" font-size="28" stroke="none">10:08</text>
+<text id="preview-date" x="100" y="143" text-anchor="middle" font-family="monospace" font-size="12" stroke="none">19-10-26</text>
+<text id="preview-status" x="100" y="165" text-anchor="middle" font-family="monospace" font-size="9" stroke="none">BAT 85% · LINK</text>
+</g></svg>
+<p id="preview-caption">Style preview. Your watch uses its own fonts and screen layout.</p></div>
+<form id="config">
+<section class="card" aria-labelledby="display-heading"><h2 id="display-heading">Your display</h2>
+<div class="field"><label for="display_mode">Time display</label><select id="display_mode" name="display_mode"><option value="digital">Digital — clear time at a glance</option><option value="analogue">Analogue — classic watch hands</option><option value="combined">Hybrid — hands with digital time</option></select></div>
+<div class="field"><label for="theme">Colour palette</label><select id="theme" name="theme"><option value="classic">Classic — mission green</option><option value="amber">Amber — warm gold</option><option value="ice">Ice — cool blue</option></select><small>Bright details on black keep the display easy to read.</small></div>
+<div class="field"><label for="date_format">Date format</label><select id="date_format" name="date_format"><option value="dd_mm_yy">Day–month–year · 19-10-26</option><option value="mm_dd_yyyy">Month–day–year · 10-19-2026</option><option value="mon_d_aug">Day and month name · MON 19 OCT</option><option value="dd_slash_mm">Day/month · 19/10</option><option value="mm_slash_dd">Month/day · 10/19</option></select></div>
+</section>
+<section class="card" aria-labelledby="details-heading"><h2 id="details-heading">Finishing touches</h2>
+<label class="toggle" for="analogue_seconds"><input id="analogue_seconds" name="analogue_seconds" type="checkbox"><span>Seconds hand<small id="seconds-help">Shown with analogue hands while the backlight is on. Off saves extra screen updates.</small></span></label>
+<label class="toggle" for="show_status"><input id="show_status" name="show_status" type="checkbox" checked><span>Watch status<small>Show battery and phone connection information.</small></span></label>
+</section>
+<p id="edit-status" role="status" aria-live="polite">Settings ready.</p>
+<button id="undo" type="button" disabled>Undo changes</button>
+<div class="actions"><button id="cancel" type="button">Cancel</button><button type="submit">Save to watch</button></div>
+</form></main>
+<script>
+var defaults = {date_format:"dd_mm_yy",display_mode:"digital",theme:"classic",analogue_seconds:false,show_status:true};
+var choices = {date_format:["dd_mm_yy","mm_dd_yyyy","mon_d_aug","dd_slash_mm","mm_slash_dd"],display_mode:["digital","analogue","combined"],theme:["classic","amber","ice"]};
+function validatedOptions(value) {
+  var result = {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) { value = {}; }
+  Object.keys(defaults).forEach(function(key) {
+    result[key] = choices[key] ? (choices[key].indexOf(value[key]) >= 0 ? value[key] : defaults[key]) : (typeof value[key] === "boolean" ? value[key] : defaults[key]);
+  });
+  return result;
+}
+function loadOptions() {
+  try {
+    var match = /(?:#|&)options=([^&]*)/.exec(window.location.hash);
+    return validatedOptions(match ? JSON.parse(decodeURIComponent(match[1])) : {});
+  } catch (error) { return validatedOptions({}); }
+}
+function readOptions() {
+  var options = {};
+  Object.keys(defaults).forEach(function(key) {
+    var input = document.getElementById(key);
+    options[key] = choices[key] ? input.value : input.checked;
+  });
+  return validatedOptions(options);
+}
+function restoreOptions(options) {
+  Object.keys(defaults).forEach(function(key) {
+    var input = document.getElementById(key);
+    if (choices[key]) { input.value = options[key]; } else { input.checked = options[key]; }
+  });
+}
+function refreshPreview() {
+  var options = readOptions();
+  var ink = {classic:"#aaffaa",amber:"#ffffaa",ice:"#aaffff"}[options.theme];
+  var group = document.getElementById("preview-ink");
+  group.setAttribute("fill", ink); group.setAttribute("stroke", ink);
+  document.getElementById("preview-hands").style.display = options.display_mode === "digital" ? "none" : "";
+  document.getElementById("preview-time-backing").style.display = options.display_mode === "combined" ? "" : "none";
+  var time = document.getElementById("preview-time");
+  time.style.display = options.display_mode === "analogue" ? "none" : "";
+  time.setAttribute("y", options.display_mode === "combined" ? "127" : "108");
+  time.setAttribute("font-size", options.display_mode === "combined" ? "18" : "28");
+  document.getElementById("preview-seconds").style.display = options.analogue_seconds && options.display_mode !== "digital" ? "" : "none";
+  document.getElementById("analogue_seconds").disabled = options.display_mode === "digital";
+  document.getElementById("seconds-help").textContent = options.display_mode === "digital" ? "Choose Analogue or Hybrid to use a seconds hand. Your preference is kept." : "Shown with analogue hands while the backlight is on. Off saves extra screen updates.";
+  document.getElementById("preview-status").style.display = options.show_status ? "" : "none";
+  document.getElementById("preview-date").textContent = {dd_mm_yy:"19-10-26",mm_dd_yyyy:"10-19-2026",mon_d_aug:"MON 19 OCT",dd_slash_mm:"19/10",mm_slash_dd:"10/19"}[options.date_format];
+  var changed = JSON.stringify(options) !== JSON.stringify(initialOptions);
+  document.getElementById("edit-status").textContent = changed ? "Unsaved changes" : "Settings ready.";
+  document.getElementById("undo").disabled = !changed;
+}
+var initialOptions = loadOptions();
+restoreOptions(initialOptions);
+document.getElementById("config").addEventListener("change", refreshPreview);
+document.getElementById("config").addEventListener("submit", function(event) {
+  event.preventDefault();
+  document.location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(readOptions()));
+});
+document.getElementById("cancel").addEventListener("click", function() { document.location = "pebblejs://close#"; });
+document.getElementById("undo").addEventListener("click", function() { restoreOptions(initialOptions); refreshPreview(); });
+refreshPreview();
+</script></body></html>

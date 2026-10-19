@@ -1,0 +1,37 @@
+{
+  "appKeys": {
+    "DATE_FORMAT": 7,
+    "ANALOGUE_SECONDS": 14,
+    "DISPLAY_MODE": 15,
+    "THEME": 16,
+    "SHOW_STATUS": 17
+  },
+  "capabilities": [
+    "configurable"
+  ],
+  "companyName": "gloriousCode",
+  "longName": "PebbleEye",
+  "projectType": "native",
+  "resources": {
+    "media": [
+      {
+        "type": "font",
+        "name": "FONT_ROBOTO_BOLD_42",
+        "file": "fonts/Roboto-Bold.ttf",
+        "characterRegex": "[ 0-9:./%A-Za-z\u00c0-\u00ff'-]"
+      }
+    ]
+  },
+  "sdkVersion": "3",
+  "shortName": "PebbleEye",
+  "targetPlatforms": [
+    "emery",
+    "gabbro"
+  ],
+  "uuid": "ec7e38a9-3852-4459-9265-597ebcfb678f",
+  "versionCode": 19,
+  "versionLabel": "1.6.2",
+  "watchapp": {
+    "watchface": true
+  }
+}

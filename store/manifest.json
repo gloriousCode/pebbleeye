@@ -1,0 +1,104 @@
+{
+  "version": "1.6.2",
+  "version_code": 19,
+  "uuid": "ec7e38a9-3852-4459-9265-597ebcfb678f",
+  "bundle_sha256": "2849d7d2b9df9e105e7738abceee7f8031d3fdc59b0b00e5b39ac9a69fbf2cf1",
+  "screenshots": [
+    {
+      "file": "emery-digital-classic.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "1f833623257e6ff81cb35771cd2d028bbfe23a7a3b492a8ddf09998cb585c8ec",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-analogue-amber.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 1,
+        "16": 1,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "6d59cbdc506404e122e635061b21a2dbc8d65f975d72d70aa718d1ba0caab537",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-combined-ice.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 2,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "2236e9149c6a03fbe3e70312a81e53a918269ad9bf7f90a01c31197488c7e91b",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "gabbro-digital-classic.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "8a3ced2e8c34c11485fdf9a921f302dffb046aacb2c823f6e79c8ea163ae7ffe",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-analogue-amber.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 1,
+        "16": 1,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "d9fb54448c99a89be2efe0b62f5316086bbcf5358cf1970eaf2a580c22830b91",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-combined-ice.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 2,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "3fd689a39312ad5f8bfc01014f3f7b6becd633069b76cb886bd8ac9104754d1e",
+      "width": 260,
+      "height": 260
+    }
+  ]
+}
