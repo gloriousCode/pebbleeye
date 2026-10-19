@@ -1,14 +1,15 @@
 Your time. Your mission.
 
 Turn your Pebble into a classic spy-watch display. PebbleEye pairs a bold,
-segmented bezel with a crisp clock and three coordinated colour palettes:
-mission green, warm amber and cool ice.
+segmented bezel with a crisp clock and eight coordinated colour palettes:
+Classic, Amber, Ice, Orchid, Lagoon, Ember, Silver and Rose.
 
 Choose Digital for an instant read, Analogue for a traditional dial, or Hybrid
 for full-size hands with digital time written over the dial.
 
 Make it yours:
-• Three display modes and three colour palettes.
+• Three display modes and eight colour palettes.
+• Smooth, readable time digits with crisp date and status labels.
 • Five date formats, plus your watch’s 12-hour or 24-hour setting.
 • Optional battery and phone connection information.
 • Optional seconds hand while the backlight is on.

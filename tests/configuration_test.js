@@ -90,7 +90,7 @@ test('storage failures and synchronous send failure do not crash configuration',
 });
 test('every setting combination round-trips through the form and bridge', () => {
   for (const display_mode of ['digital','analogue','combined']) {
-    for (const theme of ['classic','amber','ice']) {
+    for (const theme of ['classic','amber','ice','orchid','lagoon','ember','silver','rose']) {
       for (const date_format of ['dd_mm_yy','mm_dd_yyyy','mon_d_aug','dd_slash_mm','mm_slash_dd']) {
         for (const analogue_seconds of [false,true]) {
           for (const show_status of [false,true]) {
@@ -127,4 +127,59 @@ test('preview and undo reflect edits while preserving a hidden seconds preferenc
   assert.equal(e.nodes.undo.disabled, true); assert.equal(e.nodes['preview-status'].style.display, 'none');
   assert.equal(e.nodes['preview-time-backing'].style.display, '');
   assert.equal(e.nodes['preview-time'].attributes.y, '127');
+});
+
+test('all eight palettes have readable main text and matching previews', () => {
+  const expected = {
+    classic:['#aaffaa','#00aa00','#005500'], amber:['#ffffaa','#ffff55','#555500'],
+    ice:['#aaffff','#00aaff','#000055'], orchid:['#ffaaff','#aa55ff','#550055'],
+    lagoon:['#aaffff','#55aaaa','#005555'], ember:['#ffaa55','#ff5555','#550000'],
+    silver:['#ffffff','#aaaaaa','#555555'], rose:['#ffaaaa','#ff5555','#550000']
+  };
+  function luminance(hex) {
+    const channels = hex.slice(1).match(/../g).map(value => parseInt(value,16)/255)
+      .map(value => value <= 0.04045 ? value/12.92 : Math.pow((value+0.055)/1.055,2.4));
+    return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+  }
+  Object.entries(expected).forEach(([theme, [bright, muted, panel]], index) => {
+    const e = editor({theme});
+    assert.deepEqual(plain(e.context.paletteColours[theme]), {bright,muted,panel});
+    assert.equal(e.nodes['preview-ink'].attributes.fill, bright);
+    assert.equal(e.nodes['preview-arcs'].attributes.stroke, muted);
+    assert.equal(e.nodes['preview-panel'].attributes.fill, panel);
+    for (const background of [panel,'#000000']) {
+      const contrast = (luminance(bright)+0.05)/(luminance(background)+0.05);
+      assert.ok(contrast > 4.5, theme + ' contrast ' + contrast);
+    }
+    const b = bridge(); b.handlers.webviewclosed({response: JSON.stringify({theme})});
+    assert.equal(b.messages[0].settings['16'], index);
+  });
+});
+
+test('watch renderer palettes match the page and bridge theme IDs', () => {
+  const source = fs.readFileSync(path.join(root, 'src/spy_face.c'), 'utf8');
+  const paletteFunction = source.match(/static SpyPalette spy_palette\(int theme\)\s*\{([\s\S]*?)\n\}/);
+  assert.ok(paletteFunction, 'watch palette function is available');
+  const watchPalettes = new Map();
+  for (const match of paletteFunction[1].matchAll(/(default|case\s+(\d+)):\s*return\s*\(SpyPalette\)\s*\{([^}]+)\}/g)) {
+    const id = match[1] === 'default' ? 0 : Number(match[2]);
+    assert.ok(!watchPalettes.has(id), 'unique watch theme ID ' + id);
+    const colours = [...match[3].matchAll(/spy_colour\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/g)].map(colour => {
+      const components = colour.slice(1).map(Number);
+      components.forEach(component => assert.ok([0,85,170,255].includes(component), 'native Pebble colour component'));
+      return '#' + components.map(component => component.toString(16).padStart(2, '0')).join('');
+    });
+    assert.equal(colours.length, 3, 'bright, muted and panel colours for theme ' + id);
+    watchPalettes.set(id, {bright:colours[0], muted:colours[1], panel:colours[2]});
+  }
+  const b = bridge();
+  const e = editor({});
+  const expectedIDs = {classic:0, amber:1, ice:2, orchid:3, lagoon:4, ember:5, silver:6, rose:7};
+  assert.deepEqual(plain(b.context.themes), expectedIDs);
+  assert.deepEqual(Object.keys(e.context.paletteColours).sort(), Object.keys(expectedIDs).sort());
+  assert.equal(watchPalettes.size, Object.keys(expectedIDs).length);
+  for (const [theme, id] of Object.entries(expectedIDs)) {
+    assert.deepEqual(watchPalettes.get(id), plain(e.context.paletteColours[theme]), theme + ' watch/page parity');
+    assert.equal(b.context.prepareConfiguration(JSON.stringify({theme}))['16'], id, theme + ' bridge ID');
+  }
 });

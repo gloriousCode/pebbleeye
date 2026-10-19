@@ -1,4 +1,5 @@
 #include "spy_face.h"
+#include "smooth_fonts.h"
 #include "spy_face_geometry.h"
 #include <stdio.h>
 #include <string.h>
@@ -15,7 +16,6 @@ typedef enum {
 
 typedef struct {
   SpyFaceState state;
-  GFont time_font;
 } SpyFaceLayerData;
 
 typedef struct {
@@ -32,9 +32,14 @@ static GColor spy_colour(int red, int green, int blue)
 static SpyPalette spy_palette(int theme)
 {
   switch (theme) {
-    case 1: return (SpyPalette) { GColorPastelYellow, GColorOrange, GColorBulgarianRose };
-    case 2: return (SpyPalette) { GColorCeleste, GColorVividCerulean, GColorOxfordBlue };
-    default: return (SpyPalette) { GColorMintGreen, GColorIslamicGreen, GColorDarkGreen };
+    default: return (SpyPalette) { spy_colour(170, 255, 170), spy_colour(0, 170, 0), spy_colour(0, 85, 0) };
+    case 1: return (SpyPalette) { spy_colour(255, 255, 170), spy_colour(255, 255, 85), spy_colour(85, 85, 0) };
+    case 2: return (SpyPalette) { spy_colour(170, 255, 255), spy_colour(0, 170, 255), spy_colour(0, 0, 85) };
+    case 3: return (SpyPalette) { spy_colour(255, 170, 255), spy_colour(170, 85, 255), spy_colour(85, 0, 85) };
+    case 4: return (SpyPalette) { spy_colour(170, 255, 255), spy_colour(85, 170, 170), spy_colour(0, 85, 85) };
+    case 5: return (SpyPalette) { spy_colour(255, 170, 85), spy_colour(255, 85, 85), spy_colour(85, 0, 0) };
+    case 6: return (SpyPalette) { spy_colour(255, 255, 255), spy_colour(170, 170, 170), spy_colour(85, 85, 85) };
+    case 7: return (SpyPalette) { spy_colour(255, 170, 170), spy_colour(255, 85, 85), spy_colour(85, 0, 0) };
   }
 }
 
@@ -232,8 +237,10 @@ static void spy_draw_time(GContext *ctx, GRect frame, SpyFaceGeometry geometry,
 {
   char text[8];
   spy_format_time(text, sizeof(text), &data->state);
-  GFont font = geometry.min_side >= 220 && data->time_font != NULL
-      ? data->time_font : fonts_get_system_font(FONT_KEY_BITHAM_34_MEDIUM_NUMBERS);
+  int size = geometry.min_side >= 220 ? 42 : 34;
+  if (smooth_font_draw(ctx, text, size, frame, palette.bright, palette.panel)) return;
+  GFont font = fonts_get_system_font(geometry.min_side >= 220
+      ? FONT_KEY_BITHAM_42_BOLD : FONT_KEY_BITHAM_34_MEDIUM_NUMBERS);
   spy_draw_text(ctx, text, font, frame, palette.bright);
 }
 
@@ -274,11 +281,14 @@ static void spy_face_layer_update_proc(Layer *layer, GContext *ctx)
     graphics_draw_round_rect(ctx, readout, 4);
     char time[8];
     spy_format_time(time, sizeof(time), state);
-    GFont overlay_font = fonts_get_system_font(geometry.min_side >= 220
-        ? FONT_KEY_GOTHIC_28_BOLD : FONT_KEY_GOTHIC_24_BOLD);
-    spy_draw_text(ctx, time, overlay_font,
-        GRect(readout.origin.x + 2, readout.origin.y - 1,
-            readout.size.w - 4, readout.size.h), palette.bright);
+    GRect time_frame = GRect(readout.origin.x + 2, readout.origin.y - 1,
+        readout.size.w - 4, readout.size.h);
+    int size = geometry.min_side >= 220 ? 28 : 24;
+    if (!smooth_font_draw(ctx, time, size, time_frame, palette.bright, GColorBlack)) {
+      GFont overlay_font = fonts_get_system_font(geometry.min_side >= 220
+          ? FONT_KEY_GOTHIC_28_BOLD : FONT_KEY_GOTHIC_24_BOLD);
+      spy_draw_text(ctx, time, overlay_font, time_frame, palette.bright);
+    }
   } else {
     GRect display = spy_rect(geometry.display);
     graphics_context_set_fill_color(ctx, palette.panel);
@@ -306,7 +316,6 @@ Layer *spy_face_layer_create(GRect frame)
   data->state.battery_percent = 100;
   data->state.bluetooth_connected = true;
   data->state.show_status = true;
-  data->time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_42));
   layer_set_update_proc(layer, spy_face_layer_update_proc);
   return layer;
 }
@@ -314,8 +323,7 @@ Layer *spy_face_layer_create(GRect frame)
 void spy_face_layer_destroy(Layer *layer)
 {
   if (layer == NULL) return;
-  SpyFaceLayerData *data = layer_get_data(layer);
-  if (data->time_font != NULL) fonts_unload_custom_font(data->time_font);
+  smooth_fonts_unload();
   layer_destroy(layer);
 }
 

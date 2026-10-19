@@ -98,7 +98,7 @@ static void test_initial_settings_and_tick_policy(void) {
 static void test_batch_validation_and_persistence(void) {
   reset(); init();
   const int keys[] = {7, 14, 15, 16, 17, 7, 14, 15, 16, 17, 999, 7, 7};
-  const int values[] = {4, 1, 2, 2, 0, -1, 2, 3, 3, -1, 1, 0, 0};
+  const int values[] = {4, 1, 2, 7, 0, -1, 2, 3, 8, -1, 1, 0, 0};
   TupleValue data[ARRAY_LENGTH(keys)]; Tuple tuples[ARRAY_LENGTH(keys)];
   for (unsigned i = 0; i < ARRAY_LENGTH(keys); ++i) {
     data[i].int32 = values[i];
@@ -108,13 +108,13 @@ static void test_batch_validation_and_persistence(void) {
   DictionaryIterator it = {.tuples = tuples, .count = ARRAY_LENGTH(keys)};
   int before = renders; receive_settings(&it, NULL);
   assert(renders == before + 1 && bool_writes == 2 && int_writes == 3);
-  assert(settings.date_format == 4 && settings.analogue_seconds && settings.display_mode == 2 && settings.theme == 2 && !settings.show_status);
+  assert(settings.date_format == 4 && settings.analogue_seconds && settings.display_mode == 2 && settings.theme == 7 && !settings.show_status);
   assert(active_units == MINUTE_UNIT);
   deinit();
   /* Reload the persisted batch; bool values deliberately use separate storage. */
   window = NULL; subscribed_units = 0; init();
   assert(settings.date_format == 4 && settings.analogue_seconds && !settings.show_status);
-  assert(settings.display_mode == 2 && settings.theme == 2);
+  assert(settings.display_mode == 2 && settings.theme == 7);
   deinit();
   reset(); saved[7] = saved[15] = saved[16] = true;
   saved_int[7] = -9; saved_int[15] = 9; saved_int[16] = 9;

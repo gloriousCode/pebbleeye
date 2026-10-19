@@ -130,7 +130,7 @@ def capture(platform):
         "source_sha256": source_fingerprint(), "emulator": session, "captures": []}
     scenes = [(mode + "-" + theme, {7:2, 14:0, 15:m, 16:t, 17:1}, 10, 8, True, True)
         for m, mode in enumerate(["digital", "analogue", "combined"])
-        for t, theme in enumerate(["classic", "amber", "ice"])]
+        for t, theme in enumerate(["classic", "amber", "ice", "orchid", "lagoon", "ember", "silver", "rose"])]
     scenes += [("date-" + str(d), {7:d, 14:0, 15:0, 16:0, 17:1}, 23, 59, True, True) for d in range(5)]
     scenes += [("midnight-12h", {7:2, 14:0, 15:2, 16:0, 17:0}, 0, 0, False, True),
                ("noon-12h", {7:2, 14:0, 15:2, 16:0, 17:0}, 12, 0, False, True),

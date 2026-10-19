@@ -2,8 +2,8 @@
 
 A spy-watch display for **Pebble Time 2** (Emery, 200×228) and **Pebble Round 2**
 (Gabbro, 260×260). Segmented red/gold and blue rings frame a digital, analogue or
-hybrid clock. Classic green, warm amber and cool ice palettes are available in
-all three modes.
+hybrid clock. Eight coordinated palettes are available in all three modes: Classic, Amber, Ice,
+Orchid, Lagoon, Ember, Silver and Rose.
 
 ## Preview
 
@@ -18,7 +18,8 @@ all three modes.
 ## Features
 
 - Full-size analogue hands, clear digital time, or digital time over the analogue dial.
-- Three coordinated colour palettes and five date formats.
+- Eight coordinated colour palettes and five date formats.
+- Smooth native time digits, with measured bounds and crisp date/status labels.
 - Optional battery, phone connection and Quiet Time status (`Q`).
 - Optional seconds hand while the backlight is on. Off by default; otherwise the
   face updates on minute ticks and settings/status events.
@@ -55,7 +56,8 @@ python scripts/capture_screenshots.py --platform gabbro
 The helper owns dedicated ports 12544/12545 and leaves its emulators running.
 It checks all three modes and palettes, five dates, midnight/noon in 12-hour
 mode, and disconnected status. Raw images and source/bundle checksums stay in
-ignored `build/screenshots/`. Only six current promotional images are tracked.
+ignored `build/screenshots/`. Only sixteen current promotional images are tracked: every palette on both watches.
+Run `python3 scripts/prepare_store_screenshots.py` after capture to refresh them.
 Physical watch contrast, battery endurance and the Pebble phone webview remain
 separate device checks; emulator and host tests do not establish those results.
 
@@ -75,3 +77,14 @@ there; the standalone app removes its underlying fuzzy-text layers and resources
 The original word-clock project was [Fuzzy Text International](https://github.com/hallettj/Fuzzy-Text-International).
 
 PebbleEye is an independent, unofficial homage to classic spy-game watch displays.
+
+## Text rendering
+
+Digital and hybrid time use native 24/28/34/42-pixel Roboto Bold coverage masks,
+blended against the actual panel or black inset. All three masks share glyph
+metrics; SDK measurements reject overflow before drawing. The small system-font
+date and status labels retain their original rendering. This adds two text passes
+per visible time readout, without new timers. Font data occupies 20,676 bytes;
+packaged resources total 24,784 bytes (7,455 bytes more than before). Physical battery impact is
+unmeasured. `scripts/generate_smooth_fonts.py` regenerates masks with pebble-tool’s
+Python and SDK 4.33.1; tests cover all 1,440 times and all 64×64 colour blends.

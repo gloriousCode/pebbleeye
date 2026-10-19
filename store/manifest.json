@@ -1,8 +1,5 @@
 {
-  "version": "1.6.2",
-  "version_code": 19,
-  "uuid": "ec7e38a9-3852-4459-9265-597ebcfb678f",
-  "bundle_sha256": "2849d7d2b9df9e105e7738abceee7f8031d3fdc59b0b00e5b39ac9a69fbf2cf1",
+  "bundle_sha256": "bc022cdcb9f422d1c71e5203800a30c21d671be187c559af919a1c931b65a8e3",
   "screenshots": [
     {
       "file": "emery-digital-classic.png",
@@ -16,7 +13,8 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "1f833623257e6ff81cb35771cd2d028bbfe23a7a3b492a8ddf09998cb585c8ec",
+      "sha256": "bf49e057a6ec30896d891a6ab16a93b540a82c9ea649a45670cad1af0c9d4799",
+      "palette": "classic",
       "width": 200,
       "height": 228
     },
@@ -32,7 +30,8 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "6d59cbdc506404e122e635061b21a2dbc8d65f975d72d70aa718d1ba0caab537",
+      "sha256": "4f3f7213c1e1c12e68bd21523a7471a8a3374ac382709e1c5e51d38caaaca843",
+      "palette": "amber",
       "width": 200,
       "height": 228
     },
@@ -48,7 +47,93 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "2236e9149c6a03fbe3e70312a81e53a918269ad9bf7f90a01c31197488c7e91b",
+      "sha256": "3596661496af880712d4e48595b0263a6c4fb8e00582c57c8a93c83832762247",
+      "palette": "ice",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-digital-orchid.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 3,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "284c8dad30dbc3f2306c3c85d3fb82f1efe43f88b7b72c30b7dcae26fb67e86d",
+      "palette": "orchid",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-combined-lagoon.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 4,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "6d676626888e975897c4d1f3b52873a4287421d946125e45d39efe66d84db846",
+      "palette": "lagoon",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-analogue-ember.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 1,
+        "16": 5,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "388e31cfc3b19f79fbf5aa40affde90ce846376728ffe633b69761b5f2206e42",
+      "palette": "ember",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-digital-silver.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 6,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "9f4eaab24bf5573ae3e578cf2edaae42a340dd500b06348c979e33a87417289b",
+      "palette": "silver",
+      "width": 200,
+      "height": 228
+    },
+    {
+      "file": "emery-combined-rose.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 7,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "a3c445e0d3479991286633551f2f47e8e6180a3091841606606c7c195f97c501",
+      "palette": "rose",
       "width": 200,
       "height": 228
     },
@@ -64,7 +149,8 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "8a3ced2e8c34c11485fdf9a921f302dffb046aacb2c823f6e79c8ea163ae7ffe",
+      "sha256": "8c60158116086a857ed218133e5dd5efc350ee4ff69f754e493b95601347cccb",
+      "palette": "classic",
       "width": 260,
       "height": 260
     },
@@ -80,7 +166,8 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "d9fb54448c99a89be2efe0b62f5316086bbcf5358cf1970eaf2a580c22830b91",
+      "sha256": "7ca0f778571534ff31fbb328c5de70067e238225e54e54a3a88af663932d9dbf",
+      "palette": "amber",
       "width": 260,
       "height": 260
     },
@@ -96,9 +183,98 @@
       "time_utc": "2026-10-19T10:08:10+00:00",
       "24_hour": true,
       "connected": true,
-      "sha256": "3fd689a39312ad5f8bfc01014f3f7b6becd633069b76cb886bd8ac9104754d1e",
+      "sha256": "36dae0c212cfec109c14a89d8b787aeb03e8aa9474abd181729605e2a45bcb5c",
+      "palette": "ice",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-digital-orchid.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 3,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "3c207798a53c82688c03a5fb18d3d65c2cbe314af5eb970481708bf8f1dc594c",
+      "palette": "orchid",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-combined-lagoon.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 4,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "37ea0a47434f4298378f45e2d304fe3bb41f300b5cefd1a8ebf58702ce9f54cc",
+      "palette": "lagoon",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-analogue-ember.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 1,
+        "16": 5,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "84502dc3205af11149d445dcc10b8bd9be9838c43b6064f2f2102ab0669f247b",
+      "palette": "ember",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-digital-silver.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 0,
+        "16": 6,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "064452a0e33316594d2fea45b275c6aa04b397e6b6b8bee953b0f8c375a2422e",
+      "palette": "silver",
+      "width": 260,
+      "height": 260
+    },
+    {
+      "file": "gabbro-combined-rose.png",
+      "settings": {
+        "7": 2,
+        "14": 0,
+        "15": 2,
+        "16": 7,
+        "17": 1
+      },
+      "time_utc": "2026-10-19T10:08:10+00:00",
+      "24_hour": true,
+      "connected": true,
+      "sha256": "13555d728fe75a3ad98bb33150680cb3a3e1baea921194fe43fd1cfcca41aecf",
+      "palette": "rose",
       "width": 260,
       "height": 260
     }
-  ]
+  ],
+  "version": "1.6.2",
+  "version_code": 19,
+  "uuid": "ec7e38a9-3852-4459-9265-597ebcfb678f"
 }

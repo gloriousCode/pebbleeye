@@ -15,10 +15,64 @@
   "resources": {
     "media": [
       {
-        "type": "font",
-        "name": "FONT_ROBOTO_BOLD_42",
-        "file": "fonts/Roboto-Bold.ttf",
-        "characterRegex": "[ 0-9:./%A-Za-z\u00c0-\u00ff'-]"
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_24_1",
+        "file": "fonts/smooth/Roboto-Bold-24-1.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_24_2",
+        "file": "fonts/smooth/Roboto-Bold-24-2.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_24_3",
+        "file": "fonts/smooth/Roboto-Bold-24-3.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_28_1",
+        "file": "fonts/smooth/Roboto-Bold-28-1.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_28_2",
+        "file": "fonts/smooth/Roboto-Bold-28-2.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_28_3",
+        "file": "fonts/smooth/Roboto-Bold-28-3.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_34_1",
+        "file": "fonts/smooth/Roboto-Bold-34-1.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_34_2",
+        "file": "fonts/smooth/Roboto-Bold-34-2.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_34_3",
+        "file": "fonts/smooth/Roboto-Bold-34-3.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_42_1",
+        "file": "fonts/smooth/Roboto-Bold-42-1.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_42_2",
+        "file": "fonts/smooth/Roboto-Bold-42-2.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_SMOOTH_BOLD_42_3",
+        "file": "fonts/smooth/Roboto-Bold-42-3.pbf"
       }
     ]
   },

@@ -21,7 +21,7 @@ bool settings_apply(Settings *settings, int key, int value) {
       settings->display_mode = value;
       return true;
     case 16:
-      if (value < 0 || value > 2) return false;
+      if (value < 0 || value > 7) return false;
       settings->theme = value;
       return true;
     case 17:
