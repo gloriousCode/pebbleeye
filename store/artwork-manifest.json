@@ -1,0 +1,23 @@
+{
+  "artwork": "Original native-size promotional graphics; not watch screenshots",
+  "assets": [
+    {
+      "file": "pebbleeye-icon-80.png",
+      "width": 80,
+      "height": 80,
+      "sha256": "b273f68eb9783a8255c030531f7e1d37f258772d0547049ba90132471af7f04a"
+    },
+    {
+      "file": "pebbleeye-icon-144.png",
+      "width": 144,
+      "height": 144,
+      "sha256": "39a6a551e17b7ef2c6d3fb59000bff8efe7661c45470072e331a46c1c77336da"
+    },
+    {
+      "file": "pebbleeye-banner.png",
+      "width": 720,
+      "height": 320,
+      "sha256": "4c00c37b436bad974d74ab27f1a5f3c65f40314fef0744dc2c7147242aa9e899"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+PebbleEye is now a standalone watchface for Pebble Time 2 and Pebble Round 2.
+
+Choose digital, analogue or full-size hybrid time, with eight coordinated colour
+palettes. Native time-digit smoothing improves readability while preserving
+measured screen bounds. Customise the date, watch status and optional seconds hand
+from a clearer settings page with preview, Undo and reliable settings delivery.
+
+This release removes the unused word-clock implementation, corrects configuration
+hosting and responds immediately when the backlight changes. Seconds remain off
+by default.

@@ -12,7 +12,7 @@ Orchid, Lagoon, Ember, Silver and Rose.
 | Time 2 | ![Time 2 digital](store/emery-digital-classic.png) | ![Time 2 analogue](store/emery-analogue-amber.png) | ![Time 2 hybrid](store/emery-combined-ice.png) |
 | Round 2 | ![Round 2 digital](store/gabbro-digital-classic.png) | ![Round 2 analogue](store/gabbro-analogue-amber.png) | ![Round 2 hybrid](store/gabbro-combined-ice.png) |
 
-[Store-page concept](store/index.html) · [Listing copy](store/description.txt) ·
+[Store page and artwork](store/index.html) · [Listing copy](store/description.txt) ·
 [Configuration page](resources/configure-pebbleeye.html)
 
 ## Features
