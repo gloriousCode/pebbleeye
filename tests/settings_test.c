@@ -6,9 +6,9 @@
 int main(void) {
   Settings s = settings_defaults();
   assert(s.date_format == 0 && s.display_mode == 0 && s.theme == 0);
-  assert(!s.analogue_seconds && s.show_status);
-  const int keys[] = {7, 14, 15, 16, 17};
-  const int maxima[] = {4, 1, 2, 7, 1};
+  assert(!s.analogue_seconds && s.show_status && !s.music_enabled);
+  const int keys[] = {7, 14, 15, 16, 17, 18};
+  const int maxima[] = {4, 1, 2, 7, 1, 1};
   for (unsigned i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
     assert(!settings_apply(&s, keys[i], -1));
     assert(!settings_apply(&s, keys[i], maxima[i] + 1));

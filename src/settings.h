@@ -7,6 +7,7 @@ typedef struct {
   int theme;
   bool analogue_seconds;
   bool show_status;
+  bool music_enabled;
 } Settings;
 
 Settings settings_defaults(void);

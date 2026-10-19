@@ -1,0 +1,23 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=xOm0t-DiMwI",
+  "source_title": "Watch Theme (1 Hour) - Goldeneye 64",
+  "excerpt_start_seconds": 11,
+  "duration_seconds": 12,
+  "processing": {
+    "mono": true,
+    "high_pass_hz": 180,
+    "low_pass_hz": 6500,
+    "target_loudness_lufs": -19,
+    "fade_in_seconds": 0.05,
+    "fade_out_seconds": 0.5
+  },
+  "watch_audio": {
+    "file": "theme-11-23.s8",
+    "format": "signed 8-bit mono PCM",
+    "sample_rate_hz": 16000,
+    "speaker_api_format": "SpeakerPcmFormat_16kHz_8bit",
+    "bytes": 192000,
+    "sha256": "c3e53379e4d94dc3965e69f8d0fbd950db1ae57e17203f849063c01c528af0a5"
+  },
+  "excerpt_end_seconds": 23
+}

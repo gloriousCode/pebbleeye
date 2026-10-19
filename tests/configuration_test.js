@@ -31,7 +31,7 @@ function editor(options, hash) {
 }
 test('ready sends battery-friendly defaults and all settings keys', () => {
   const b = bridge(); b.handlers.ready();
-  assert.deepEqual(b.messages[0].settings, {'7':0,'14':0,'15':0,'16':0,'17':1});
+  assert.deepEqual(b.messages[0].settings, {'7':0,'14':0,'15':0,'16':0,'17':1,'18':0});
 });
 test('malformed, cancelled and non-object responses do not save or transmit', () => {
   for (const response of [undefined, '', 'CANCELLED', '%', '{', 'null', '[]', '12', '"text"', '{"display_mode":"__proto__","show_status":"true"}']) {
@@ -40,15 +40,15 @@ test('malformed, cancelled and non-object responses do not save or transmit', ()
   }
 });
 test('partial encoded saves preserve previous valid settings and ignore unknown keys', () => {
-  const b = bridge('{"date_format":"mon_d_aug","display_mode":"combined","analogue_seconds":true,"theme":"ice","show_status":false}');
+  const b = bridge('{"date_format":"mon_d_aug","display_mode":"combined","analogue_seconds":true,"theme":"ice","show_status":false,"music_enabled":true}');
   b.handlers.webviewclosed({response: encodeURIComponent('{"theme":"amber","unknown":99,"show_status":"yes"}')});
-  assert.deepEqual(b.messages[0].settings, {'7':2,'14':1,'15':2,'16':1,'17':0});
-  assert.deepEqual(b.stored(), {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false});
+  assert.deepEqual(b.messages[0].settings, {'7':2,'14':1,'15':2,'16':1,'17':0,'18':1});
+  assert.deepEqual(b.stored(), {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:true});
 });
 test('invalid stored settings fall back safely', () => {
   for (const stored of ['null', '[]', '%', '{"date_format":"toString","theme":99}']) {
     const b = bridge(stored); b.handlers.ready();
-    assert.deepEqual(b.messages[0].settings, {'7':0,'14':0,'15':0,'16':0,'17':1});
+    assert.deepEqual(b.messages[0].settings, {'7':0,'14':0,'15':0,'16':0,'17':1,'18':0});
   }
 });
 test('configuration opens the standalone versioned page with migrated options', () => {
@@ -94,13 +94,16 @@ test('every setting combination round-trips through the form and bridge', () => 
       for (const date_format of ['dd_mm_yy','mm_dd_yyyy','mon_d_aug','dd_slash_mm','mm_slash_dd']) {
         for (const analogue_seconds of [false,true]) {
           for (const show_status of [false,true]) {
-            const options = {date_format,display_mode,theme,analogue_seconds,show_status};
-            const e = editor(options);
-            assert.deepEqual(plain(e.context.readOptions()), options);
-            e.nodes.config.handlers.submit({preventDefault(){}});
-            const b = bridge(); b.handlers.webviewclosed({response:e.document.location.split('#')[1]});
-            assert.deepEqual(b.stored(), options);
-            assert.equal(e.nodes.analogue_seconds.disabled, display_mode === 'digital');
+            for (const music_enabled of [false,true]) {
+              const options = {date_format,display_mode,theme,analogue_seconds,show_status,music_enabled};
+              const e = editor(options);
+              assert.deepEqual(plain(e.context.readOptions()), options);
+              e.nodes.config.handlers.submit({preventDefault(){}});
+              const b = bridge(); b.handlers.webviewclosed({response:e.document.location.split('#')[1]});
+              assert.deepEqual(b.stored(), options);
+              assert.equal(e.nodes.analogue_seconds.disabled, display_mode === 'digital');
+              assert.equal(b.messages[0].settings['18'], music_enabled ? 1 : 0);
+            }
           }
         }
       }
@@ -115,7 +118,7 @@ test('malformed option URLs fall back and cancel never sends options', () => {
   }
 });
 test('preview and undo reflect edits while preserving a hidden seconds preference', () => {
-  const initial = {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false};
+  const initial = {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:true};
   const e = editor(initial);
   e.nodes.theme.value = 'ice'; e.nodes.display_mode.value = 'digital'; e.nodes.config.handlers.change();
   assert.equal(e.nodes['preview-ink'].attributes.fill, '#aaffff');
@@ -123,6 +126,8 @@ test('preview and undo reflect edits while preserving a hidden seconds preferenc
   assert.equal(e.nodes['preview-time-backing'].style.display, 'none');
   assert.equal(e.nodes['edit-status'].textContent, 'Unsaved changes');
   assert.equal(e.nodes.analogue_seconds.checked, true);
+  assert.equal(e.nodes.music_enabled.checked, true);
+  e.nodes.music_enabled.checked = false; e.nodes.config.handlers.change();
   e.nodes.undo.handlers.click(); assert.deepEqual(plain(e.context.readOptions()), initial);
   assert.equal(e.nodes.undo.disabled, true); assert.equal(e.nodes['preview-status'].style.display, 'none');
   assert.equal(e.nodes['preview-time-backing'].style.display, '');
@@ -182,4 +187,24 @@ test('watch renderer palettes match the page and bridge theme IDs', () => {
     assert.deepEqual(watchPalettes.get(id), plain(e.context.paletteColours[theme]), theme + ' watch/page parity');
     assert.equal(b.context.prepareConfiguration(JSON.stringify({theme}))['16'], id, theme + ' bridge ID');
   }
+});
+
+test('music is opt-in and malformed values cannot enable or reset it', () => {
+  const defaultEditor = editor({});
+  assert.equal(defaultEditor.nodes.music_enabled.checked, false);
+  for (const invalid of ['true',1,null,{},[]]) {
+    const response = JSON.stringify({music_enabled:invalid});
+    const fresh = bridge(); fresh.handlers.webviewclosed({response});
+    assert.equal(fresh.messages.length, 0);
+    const enabled = bridge('{"music_enabled":true}');
+    enabled.handlers.webviewclosed({response:JSON.stringify({theme:'rose',music_enabled:invalid})});
+    assert.equal(enabled.stored().music_enabled, true);
+    assert.equal(enabled.messages[0].settings['18'], 1);
+    const e = editor({music_enabled:invalid});
+    assert.equal(e.nodes.music_enabled.checked, false);
+  }
+  const b = bridge('{"music_enabled":true}');
+  b.handlers.webviewclosed({response:'{"music_enabled":false}'});
+  assert.equal(b.messages[0].settings['18'], 0);
+  assert.equal(b.stored().music_enabled, false);
 });

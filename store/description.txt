@@ -13,9 +13,11 @@ Make it yours:
 • Five date formats, plus your watch’s 12-hour or 24-hour setting.
 • Optional battery and phone connection information.
 • Optional seconds hand while the backlight is on.
+• Time 2 only: optional 12-second theme on a double tap of the watch.
 • A settings preview, easy Undo and clear Save controls.
 
 Designed specifically for Pebble Time 2 and Pebble Round 2. Seconds are off by
-default; regular timekeeping updates once a minute. No account required.
+default; regular timekeeping updates once a minute. Music is also off by default
+and respects mute and Quiet Time. Round 2 has no speaker. No account required.
 
 An independent, unofficial homage to classic spy-game watch displays.

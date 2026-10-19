@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "settings.h"
 #include "spy_face.h"
+#include "theme_audio.h"
 
 static Window *window;
 static Layer *face;
@@ -67,13 +68,14 @@ static void receive_settings(DictionaryIterator *iterator, void *context) {
     if ((tuple->type != TUPLE_INT && tuple->type != TUPLE_UINT) || tuple->length != 4) continue;
     int value = tuple->value->int32;
     if (settings_apply(&settings, tuple->key, value)) {
-      if (tuple->key == 14 || tuple->key == 17) {
+      if (tuple->key == 14 || tuple->key == 17 || tuple->key == 18) {
         persist_write_bool(tuple->key, value != 0);
       } else {
         persist_write_int(tuple->key, value);
       }
     }
   }
+  theme_audio_set_enabled(settings.music_enabled);
   update_tick_subscription();
   refresh();
 }
@@ -102,11 +104,11 @@ static void unload(Window *unloaded_window) {
 
 static void init(void) {
   settings = settings_defaults();
-  const int keys[] = {7, 14, 15, 16, 17};
+  const int keys[] = {7, 14, 15, 16, 17, 18};
   for (unsigned i = 0; i < ARRAY_LENGTH(keys); ++i) {
     int key = keys[i];
     if (persist_exists(key)) {
-      int value = (key == 14 || key == 17) ? persist_read_bool(key) : persist_read_int(key);
+      int value = (key == 14 || key == 17 || key == 18) ? persist_read_bool(key) : persist_read_int(key);
       settings_apply(&settings, key, value);
     }
   }
@@ -123,10 +125,12 @@ static void init(void) {
   battery_state_service_subscribe(battery_changed);
   bluetooth_connection_service_subscribe(connection_changed);
   backlight_service_subscribe(backlight_changed);
+  theme_audio_set_enabled(settings.music_enabled);
   update_tick_subscription();
 }
 
 static void deinit(void) {
+  theme_audio_deinit();
   tick_timer_service_unsubscribe();
   battery_state_service_unsubscribe();
   bluetooth_connection_service_unsubscribe();

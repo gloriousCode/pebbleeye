@@ -10,6 +10,10 @@ test:
 	./build/settings_test
 	$(CC) -std=c99 -Wall -Wextra -Werror -Itests/stubs -Isrc tests/runtime_test.c src/settings.c -o build/runtime_test
 	./build/runtime_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_EMERY -Itests/stubs -Isrc tests/theme_audio_test.c -o build/theme_audio_test
+	./build/theme_audio_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_GABBRO -Itests/stubs -Isrc tests/theme_audio_test.c -o build/theme_audio_gabbro_test
+	./build/theme_audio_gabbro_test
 	node --test tests/configuration_test.js
 	$(CC) -std=c99 -Wall -Wextra -Werror -Itests/smooth_font_stubs -Isrc tests/smooth_font_renderer_test.c -o build/smooth_font_renderer_test
 	./build/smooth_font_renderer_test

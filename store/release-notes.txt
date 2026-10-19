@@ -8,3 +8,6 @@ from a clearer settings page with preview, Undo and reliable settings delivery.
 This release removes the unused word-clock implementation, corrects configuration
 hosting and responds immediately when the backlight changes. Seconds remain off
 by default.
+
+Time 2 adds optional double-tap theme playback, disabled by default and respecting
+mute and Quiet Time. Round 2 has no speaker and does not include the audio.

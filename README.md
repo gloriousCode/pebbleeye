@@ -23,6 +23,8 @@ Orchid, Lagoon, Ember, Silver and Rose.
 - Optional battery, phone connection and Quiet Time status (`Q`).
 - Optional seconds hand while the backlight is on. Off by default; otherwise the
   face updates on minute ticks and settings/status events.
+- Optional 12-second theme on a double tap of the watch, on Time 2 only. Off by
+  default; respects mute and Quiet Time. Round 2 has no speaker.
 - Watch system 12-hour or 24-hour preference.
 - Mobile settings with illustrative preview, Undo, Save and Cancel.
 - Validated settings, preserved preferences and bounded delivery retries.
@@ -85,6 +87,20 @@ blended against the actual panel or black inset. All three masks share glyph
 metrics; SDK measurements reject overflow before drawing. The small system-font
 date and status labels retain their original rendering. This adds two text passes
 per visible time readout, without new timers. Font data occupies 20,676 bytes;
-packaged resources total 24,784 bytes (7,455 bytes more than before). Physical battery impact is
+font-only packaged resources total 24,784 bytes (7,455 bytes more than before).
+Time 2 additionally includes a 192,000-byte audio resource; Round 2 omits it. Physical battery impact is
 unmeasured. `scripts/generate_smooth_fonts.py` regenerates masks with pebble-tool’s
 Python and SDK 4.33.1; tests cover all 1,440 times and all 64×64 colour blends.
+
+## Double-tap music
+
+Enable **Double-tap music (Time 2 only)** in settings, then tap the watch twice
+in quick succession. This uses the accelerometer, rather than touchscreen taps.
+The approved excerpt runs from 0:11 to 0:23, converted to mono signed 8-bit PCM
+at 16 kHz with short fades. Playback streams from resources through a small
+buffer; the full clip is never loaded into RAM. No audio timers or tap
+subscription run when disabled. Playback cannot start during mute or Quiet Time,
+and repeated taps do not restart an active clip. Disable the option to stop it.
+
+Round 2 has no speaker, so this setting does not enable audio on that model.
+Physical speaker quality and real-world tap sensitivity require a Time 2 device.

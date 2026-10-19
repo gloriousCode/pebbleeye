@@ -4,7 +4,8 @@
     "ANALOGUE_SECONDS": 14,
     "DISPLAY_MODE": 15,
     "THEME": 16,
-    "SHOW_STATUS": 17
+    "SHOW_STATUS": 17,
+    "MUSIC_ENABLED": 18
   },
   "capabilities": [
     "configurable"
@@ -73,6 +74,14 @@
         "type": "raw",
         "name": "FONT_SMOOTH_BOLD_42_3",
         "file": "fonts/smooth/Roboto-Bold-42-3.pbf"
+      },
+      {
+        "type": "raw",
+        "name": "THEME_AUDIO",
+        "file": "audio/theme-11-23.s8",
+        "targetPlatforms": [
+          "emery"
+        ]
       }
     ]
   },

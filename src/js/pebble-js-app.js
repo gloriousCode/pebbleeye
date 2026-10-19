@@ -27,7 +27,7 @@ function validOptions(value) {
       result[key] = value[key];
     }
   });
-  ["analogue_seconds", "show_status"].forEach(function(key) {
+  ["analogue_seconds", "show_status", "music_enabled"].forEach(function(key) {
     if (typeof value[key] === "boolean") { result[key] = value[key]; }
   });
   return result;
@@ -46,7 +46,8 @@ function prepareConfiguration(serialized) {
     "14": value.analogue_seconds === true ? 1 : 0,
     "15": displayModes[value.display_mode] || 0,
     "16": themes[value.theme] || 0,
-    "17": value.show_status === false ? 0 : 1};
+    "17": value.show_status === false ? 0 : 1,
+    "18": value.music_enabled === true ? 1 : 0};
 }
 
 // One delivery at a time: a newer save supersedes queued retries of older settings.
