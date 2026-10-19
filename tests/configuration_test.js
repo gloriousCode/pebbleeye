@@ -42,8 +42,8 @@ test('malformed, cancelled and non-object responses do not save or transmit', ()
 test('partial encoded saves preserve previous valid settings and ignore unknown keys', () => {
   const b = bridge('{"date_format":"mon_d_aug","display_mode":"combined","analogue_seconds":true,"theme":"ice","show_status":false,"music_enabled":true,"vibrate_theme":true}');
   b.handlers.webviewclosed({response: encodeURIComponent('{"theme":"amber","unknown":99,"show_status":"yes"}')});
-  assert.deepEqual(b.messages[0].settings, {'7':2,'14':1,'15':2,'16':1,'17':0,'18':1,'19':1});
-  assert.deepEqual(b.stored(), {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:true,vibrate_theme:true});
+  assert.deepEqual(b.messages[0].settings, {'7':2,'14':1,'15':2,'16':1,'17':0,'18':0,'19':1});
+  assert.deepEqual(b.stored(), {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:false,vibrate_theme:true});
 });
 test('invalid stored settings fall back safely', () => {
   for (const stored of ['null', '[]', '%', '{"date_format":"toString","theme":99}']) {
@@ -55,7 +55,7 @@ test('configuration opens the standalone versioned page with migrated options', 
   const b = bridge('{"display_mode":"analogue"}'); b.handlers.showConfiguration();
   const url = new URL(b.urls[0]);
   assert.equal(url.origin + url.pathname, 'https://gloriouscode.github.io/pebbleeye/resources/configure-pebbleeye.html');
-  assert.equal(url.searchParams.get('v'), '1.6.2');
+  assert.equal(url.searchParams.get('v'), '1.6.3');
   assert.deepEqual(JSON.parse(decodeURIComponent(url.hash.slice(9))), {display_mode:'analogue'});
 });
 test('failed delivery stops after three attempts', () => {
@@ -96,14 +96,14 @@ test('every setting combination round-trips through the form and bridge', () => 
           for (const show_status of [false,true]) {
             for (const music_enabled of [false,true]) {
               for (const vibrate_theme of [false,true]) {
-                const options = {date_format,display_mode,theme,analogue_seconds,show_status,music_enabled,vibrate_theme};
+                const options = {date_format,display_mode,theme,analogue_seconds,show_status,music_enabled:music_enabled && !vibrate_theme,vibrate_theme};
                 const e = editor(options);
                 assert.deepEqual(plain(e.context.readOptions()), options);
                 e.nodes.config.handlers.submit({preventDefault(){}});
                 const b = bridge(); b.handlers.webviewclosed({response:e.document.location.split('#')[1]});
                 assert.deepEqual(b.stored(), options);
                 assert.equal(e.nodes.analogue_seconds.disabled, display_mode === 'digital');
-                assert.equal(b.messages[0].settings['18'], music_enabled ? 1 : 0);
+                assert.equal(b.messages[0].settings['18'], options.music_enabled ? 1 : 0);
                 assert.equal(b.messages[0].settings['19'], vibrate_theme ? 1 : 0);
               }
             }
@@ -121,7 +121,7 @@ test('malformed option URLs fall back and cancel never sends options', () => {
   }
 });
 test('preview and undo reflect edits while preserving a hidden seconds preference', () => {
-  const initial = {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:true,vibrate_theme:true};
+  const initial = {date_format:'mon_d_aug',display_mode:'combined',theme:'amber',analogue_seconds:true,show_status:false,music_enabled:false,vibrate_theme:true};
   const e = editor(initial);
   e.nodes.theme.value = 'ice'; e.nodes.display_mode.value = 'digital'; e.nodes.config.handlers.change();
   assert.equal(e.nodes['preview-ink'].attributes.fill, '#aaffff');
@@ -129,7 +129,7 @@ test('preview and undo reflect edits while preserving a hidden seconds preferenc
   assert.equal(e.nodes['preview-time-backing'].style.display, 'none');
   assert.equal(e.nodes['edit-status'].textContent, 'Unsaved changes');
   assert.equal(e.nodes.analogue_seconds.checked, true);
-  assert.equal(e.nodes.music_enabled.checked, true);
+  assert.equal(e.nodes.music_enabled.checked, false);
   e.nodes.music_enabled.checked = false;
   assert.equal(e.nodes.vibrate_theme.checked, true);
   e.nodes.vibrate_theme.checked = false; e.nodes.config.handlers.change();
@@ -214,7 +214,7 @@ test('music is opt-in and malformed values cannot enable or reset it', () => {
   assert.equal(b.stored().music_enabled, false);
 });
 
-test('Round 2 vibration is opt-in and rejects malformed values without losing saved preferences', () => {
+test('vibration on both watches is opt-in and rejects malformed values without losing saved preferences', () => {
   assert.equal(editor({}).nodes.vibrate_theme.checked, false);
   for (const invalid of ['true',1,null,{},[]]) {
     const fresh = bridge();
@@ -224,12 +224,51 @@ test('Round 2 vibration is opt-in and rejects malformed values without losing sa
     enabled.handlers.webviewclosed({response:JSON.stringify({theme:'orchid',vibrate_theme:invalid})});
     assert.equal(enabled.stored().vibrate_theme, true);
     assert.equal(enabled.messages[0].settings['19'], 1);
-    assert.equal(enabled.messages[0].settings['18'], 1);
+    assert.equal(enabled.messages[0].settings['18'], 0);
     assert.equal(editor({vibrate_theme:invalid}).nodes.vibrate_theme.checked, false);
   }
   const b = bridge('{"vibrate_theme":true,"music_enabled":true}');
   b.handlers.webviewclosed({response:'{"vibrate_theme":false}'});
   assert.equal(b.messages[0].settings['19'], 0);
-  assert.equal(b.messages[0].settings['18'], 1);
+  assert.equal(b.messages[0].settings['18'], 0);
   assert.equal(b.stored().vibrate_theme, false);
+});
+
+test('music and vibration selections are mutually exclusive and either can be turned off', () => {
+  const e = editor({vibrate_theme:true});
+  e.nodes.music_enabled.checked = true;
+  e.nodes.config.handlers.change({target:e.nodes.music_enabled});
+  assert.equal(e.nodes.vibrate_theme.checked, false);
+  assert.equal(e.context.readOptions().music_enabled, true);
+  e.nodes.vibrate_theme.checked = true;
+  e.nodes.config.handlers.change({target:e.nodes.vibrate_theme});
+  assert.equal(e.nodes.music_enabled.checked, false);
+  e.nodes.vibrate_theme.checked = false;
+  e.nodes.config.handlers.change({target:e.nodes.vibrate_theme});
+  assert.equal(e.context.readOptions().music_enabled, false);
+  assert.equal(e.context.readOptions().vibrate_theme, false);
+  e.nodes.undo.handlers.click();
+  assert.equal(e.nodes.vibrate_theme.checked, true);
+  assert.equal(e.nodes.music_enabled.checked, false);
+});
+test('partial action changes replace the previous action and legacy conflicts prefer vibration', () => {
+  const b = bridge('{"music_enabled":true,"vibrate_theme":true}');
+  b.handlers.ready();
+  assert.equal(b.messages[0].settings['18'], 0);
+  assert.equal(b.messages[0].settings['19'], 1);
+  b.messages[0].success();
+  b.handlers.webviewclosed({response:'{"music_enabled":true}'});
+  assert.equal(b.stored().music_enabled, true);
+  assert.equal(b.stored().vibrate_theme, false);
+  b.messages[1].success();
+  b.handlers.webviewclosed({response:'{"vibrate_theme":true}'});
+  assert.equal(b.stored().music_enabled, false);
+  assert.equal(b.stored().vibrate_theme, true);
+  b.messages[2].success();
+  b.handlers.webviewclosed({response:'{"music_enabled":true,"vibrate_theme":true}'});
+  assert.equal(b.stored().music_enabled, false);
+  assert.equal(b.stored().vibrate_theme, true);
+  const e = editor({music_enabled:true,vibrate_theme:true});
+  assert.equal(e.nodes.music_enabled.checked, false);
+  assert.equal(e.nodes.vibrate_theme.checked, true);
 });

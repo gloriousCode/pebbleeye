@@ -4,8 +4,8 @@
 #if defined(PBL_PLATFORM_EMERY)
 enum { CLIP_BYTES = 192000, BUFFER_BYTES = 512, PUMP_MS = 10,
        MAX_STALLED_PUMPS = 100, MAX_PUMPS = 2000 };
-static bool enabled, playing, waiting_tap, draining;
-static uint32_t first_tap_ms, offset, pumps, stalled;
+static bool enabled, playing, draining;
+static uint32_t offset, pumps, stalled;
 static AppTimer *timer;
 static ResHandle resource;
 static uint8_t buffer[BUFFER_BYTES];
@@ -63,21 +63,8 @@ static void pump(void *context) {
   if (!timer) stop_owned_playback();
 }
 
-static void tap(AccelAxisType axis, int32_t direction) {
-  (void)axis; (void)direction;
+void theme_audio_trigger(void) {
   if (!enabled || playing) return;
-  time_t seconds;
-  uint16_t milliseconds;
-  time_ms(&seconds, &milliseconds);
-  uint32_t now = (uint32_t)seconds * 1000u + milliseconds;
-  uint32_t elapsed = now - first_tap_ms;
-  if (!waiting_tap || elapsed > 500) {
-    first_tap_ms = now;
-    waiting_tap = true;
-    return;
-  }
-  if (elapsed < 100) return;
-  waiting_tap = false;
   if (quiet_time_is_active() || speaker_is_muted() || speaker_get_status() != SpeakerStatusIdle) return;
   resource = resource_get_handle(RESOURCE_ID_THEME_AUDIO);
   if (!resource || resource_size(resource) != CLIP_BYTES) return;
@@ -93,19 +80,14 @@ static void tap(AccelAxisType axis, int32_t direction) {
 void theme_audio_set_enabled(bool requested) {
   if (enabled == requested) return;
   enabled = requested;
-  waiting_tap = false;
-  if (enabled) {
-    accel_tap_service_subscribe(tap);
-  } else {
-    accel_tap_service_unsubscribe();
-    stop_owned_playback();
-  }
+  if (!enabled) stop_owned_playback();
 }
 
 void theme_audio_deinit(void) {
   theme_audio_set_enabled(false);
 }
 #else
+void theme_audio_trigger(void) {}
 void theme_audio_set_enabled(bool enabled) { (void)enabled; }
 void theme_audio_deinit(void) {}
 #endif

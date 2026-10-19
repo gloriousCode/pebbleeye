@@ -14,12 +14,14 @@ Make it yours:
 • Optional battery and phone connection information.
 • Optional seconds hand while the backlight is on.
 • Time 2 only: optional 12-second theme on a double tap of the watch.
-• Round 2 only: optional three-second vibration rhythm on a double tap.
+• Time 2 and Round 2: optional three-second vibration rhythm on a double tap.
 • A settings preview, easy Undo and clear Save controls.
 
 Designed specifically for Pebble Time 2 and Pebble Round 2. Seconds are off by
 default; regular timekeeping updates once a minute. Music is also off by default
-and respects mute and Quiet Time. Round 2 has no speaker; its optional vibration
-rhythm is also off by default and respects Quiet Time. No account required.
+and respects mute and Quiet Time. Vibration is off by default and respects Quiet
+Time. Choose music or vibration on Time 2; both cannot be enabled together.
+Round 2 has no speaker. Wake the backlight, hold your wrist still, then double-tap
+gently within eight seconds. Wake the light again to repeat. No account required.
 
 An independent, unofficial homage to classic spy-game watch displays.

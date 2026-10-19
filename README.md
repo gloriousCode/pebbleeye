@@ -25,7 +25,7 @@ Orchid, Lagoon, Ember, Silver and Rose.
   face updates on minute ticks and settings/status events.
 - Optional 12-second theme on a double tap of the watch, on Time 2 only. Off by
   default; respects mute and Quiet Time. Round 2 has no speaker.
-- Optional three-second vibration rhythm on a double tap, on Round 2 only.
+- Optional three-second vibration rhythm on a double tap, on Time 2 and Round 2.
   Off by default; respects Quiet Time.
 - Watch system 12-hour or 24-hour preference.
 - Mobile settings with illustrative preview, Undo, Save and Cancel.
@@ -33,8 +33,8 @@ Orchid, Lagoon, Ember, Silver and Rose.
 
 This is a separate app from Wordish. Its existing experimental UUID
 `ec7e38a9-3852-4459-9265-597ebcfb678f` is preserved, along with the
-`gabbroeye-hud-options-v1` phone storage key. The standalone release is **1.6.2**,
-version code **19**, advancing the branch's 1.5.1. Older Pebble models are not supported.
+`gabbroeye-hud-options-v1` phone storage key. The standalone release is **1.6.3**,
+version code **20**, advancing the branch's 1.5.1. Older Pebble models are not supported.
 
 ## Build and verify
 
@@ -94,28 +94,23 @@ Time 2 additionally includes a 192,000-byte audio resource; Round 2 omits it. Ph
 unmeasured. `scripts/generate_smooth_fonts.py` regenerates masks with pebble-tool’s
 Python and SDK 4.33.1; tests cover all 1,440 times and all 64×64 colour blends.
 
-## Double-tap music
+## Gentle double taps
 
-Enable **Double-tap music (Time 2 only)** in settings, then tap the watch twice
-in quick succession. This uses the accelerometer, rather than touchscreen taps.
-The approved excerpt runs from 0:11 to 0:23, converted to mono signed 8-bit PCM
-at 16 kHz with short fades. Playback streams from resources through a small
-buffer; the full clip is never loaded into RAM. No audio timers or tap
-subscription run when disabled. Playback cannot start during mute or Quiet Time,
-and repeated taps do not restart an active clip. Disable the option to stop it.
+Wake the backlight, hold your wrist still, then tap gently twice within eight
+seconds. Time 2 offers either **Double-tap music** or **Vibrate theme**; enabling
+one switches the other off. Both may be off. Round 2 supports vibration only.
+Old configurations containing both flags migrate to vibration.
 
-Round 2 has no speaker, so this setting does not enable audio on that model.
-Physical speaker quality and real-world tap sensitivity require a Time 2 device.
+The shared detector samples at 50 Hz in batches of five only while the backlight
+is lit, for up to eight seconds. It stops after one recognised gesture, when the
+light goes out, or when disabled. Wake the light again to repeat. There is no
+idle accelerometer subscription or polling timer. The recogniser rejects
+sustained movement, recoil and vibration samples. Thresholds are covered by
+synthetic tests; physical sensitivity and battery impact need watch measurements.
 
-## Round 2 vibration theme
-
-Enable **Vibrate theme (Round 2 only)** to play a three-second rhythm when you
-tap the watch twice. Seven brief pulses follow prominent beats from the approved
-audio excerpt; this reproduces timing, not musical pitch. Round 2 still contains
-no audio resource. The option is independent of Time 2 music and defaults to off.
-
-Quiet Time prevents the pattern from starting and stops an active pattern.
-Switching the option off also cancels it. Taps during the pattern and a short
-settling interval are ignored so motor vibrations cannot immediately retrigger
-it. No vibration timer or tap subscription runs while the option is disabled.
-Actual feel and tap sensitivity require checking on a physical Round 2.
+Music plays the approved 12-second clip on Time 2 and respects mute and Quiet
+Time. It streams a 192,000-byte resource with a small RAM buffer; Round 2 still
+omits the audio resource. Vibration plays a three-second rhythm on either model
+and respects Quiet Time. It reproduces timing rather than musical pitch.
+Changing mode or disabling an active mode stops its playback. Existing app UUID,
+settings keys and configuration address are preserved.

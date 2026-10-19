@@ -34,8 +34,9 @@
 </section>
 <section class="card" aria-labelledby="details-heading"><h2 id="details-heading">Finishing touches</h2>
 <label class="toggle" for="analogue_seconds"><input id="analogue_seconds" name="analogue_seconds" type="checkbox"><span>Seconds hand<small id="seconds-help">Shown with analogue hands while the backlight is on. Off saves extra screen updates.</small></span></label>
-<label class="toggle" for="music_enabled"><input id="music_enabled" name="music_enabled" type="checkbox"><span>Double-tap music (Time 2 only)<small>Play the 12-second theme when you tap the watch twice. Respects mute and Quiet Time. Round 2 has no speaker.</small></span></label>
-<label class="toggle" for="vibrate_theme"><input id="vibrate_theme" name="vibrate_theme" type="checkbox"><span>Vibrate theme (Round 2 only)<small>Tap twice for a short rhythmic vibration. Off by default and respects Quiet Time. Plays a rhythm, not a melody.</small></span></label>
+<p>Wake the backlight, hold the watch still, then tap gently within 8 seconds. One action plays per backlight window. Choose music or vibration, or leave both off.</p>
+<label class="toggle" for="music_enabled"><input id="music_enabled" name="music_enabled" type="checkbox"><span>Tap music (Time 2 only)<small>Play the 12-second theme. Respects mute and Quiet Time. Selecting music switches vibration off. Round 2 has no speaker.</small></span></label>
+<label class="toggle" for="vibrate_theme"><input id="vibrate_theme" name="vibrate_theme" type="checkbox"><span>Vibrate theme (Time 2 and Round 2)<small>Play a short rhythmic vibration. Off by default and respects Quiet Time. Selecting vibration switches music off. Plays a rhythm, not a melody.</small></span></label>
 <label class="toggle" for="show_status"><input id="show_status" name="show_status" type="checkbox" checked><span>Watch status<small>Show battery and phone connection information.</small></span></label>
 </section>
 <p id="edit-status" role="status" aria-live="polite">Settings ready.</p>
@@ -61,6 +62,7 @@ function validatedOptions(value) {
   Object.keys(defaults).forEach(function(key) {
     result[key] = choices[key] ? (choices[key].indexOf(value[key]) >= 0 ? value[key] : defaults[key]) : (typeof value[key] === "boolean" ? value[key] : defaults[key]);
   });
+  if (result.music_enabled && result.vibrate_theme) { result.music_enabled = false; }
   return result;
 }
 function loadOptions() {
@@ -108,7 +110,14 @@ function refreshPreview() {
 }
 var initialOptions = loadOptions();
 restoreOptions(initialOptions);
-document.getElementById("config").addEventListener("change", refreshPreview);
+document.getElementById("config").addEventListener("change", function(event) {
+  var target = event && event.target;
+  if (target && target.checked) {
+    if (target === document.getElementById("music_enabled")) { document.getElementById("vibrate_theme").checked = false; }
+    if (target === document.getElementById("vibrate_theme")) { document.getElementById("music_enabled").checked = false; }
+  }
+  refreshPreview();
+});
 document.getElementById("config").addEventListener("submit", function(event) {
   event.preventDefault();
   document.location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(readOptions()));

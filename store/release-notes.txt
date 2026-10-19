@@ -1,16 +1,14 @@
-PebbleEye is now a standalone watchface for Pebble Time 2 and Pebble Round 2.
+PebbleEye 1.6.3
 
-Choose digital, analogue or full-size hybrid time, with eight coordinated colour
-palettes. Native time-digit smoothing improves readability while preserving
-measured screen bounds. Customise the date, watch status and optional seconds hand
-from a clearer settings page with preview, Undo and reliable settings delivery.
+Gentle double taps now use sampled acceleration during a short backlight window.
+Wake the light, hold your wrist still and tap twice within eight seconds.
+Detection stops after one gesture, when the light goes out, or after eight seconds.
 
-This release removes the unused word-clock implementation, corrects configuration
-hosting and responds immediately when the backlight changes. Seconds remain off
-by default.
+Time 2 now supports the three-second vibration rhythm as well as music. Choose
+one mode or leave both off; the settings page and watch prevent both running
+together. Existing conflicting preferences migrate to vibration. Round 2 retains
+vibration and omits the audio resource. Mute and Quiet Time are respected.
 
-Time 2 adds optional double-tap theme playback, disabled by default and respecting
-mute and Quiet Time. Round 2 has no speaker and does not include the audio.
-
-Round 2 adds an optional three-second vibration rhythm on double tap. It defaults
-to off, respects Quiet Time and ignores taps while the pattern is running.
+Native builds and synthetic gesture/lifecycle tests pass. Physical sensitivity
+and battery impact still need measurement on watches. Store images are unchanged
+because this release changes interaction rather than the rendered face.

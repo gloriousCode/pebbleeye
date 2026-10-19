@@ -1,4 +1,4 @@
-var VERSION = "1.6.2";
+var VERSION = "1.6.3";
 var OPTIONS_STORAGE_KEY = "gabbroeye-hud-options-v1";
 var CONFIG_URL = "https://gloriouscode.github.io/pebbleeye/resources/configure-pebbleeye.html";
 var dateFormats = {dd_mm_yy: 0, mm_dd_yyyy: 1, mon_d_aug: 2, dd_slash_mm: 3, mm_slash_dd: 4};
@@ -30,6 +30,7 @@ function validOptions(value) {
   ["analogue_seconds", "show_status", "music_enabled", "vibrate_theme"].forEach(function(key) {
     if (typeof value[key] === "boolean") { result[key] = value[key]; }
   });
+  if (result.music_enabled === true && result.vibrate_theme === true) { result.music_enabled = false; }
   return result;
 }
 
@@ -85,6 +86,9 @@ function webviewclosed(event) {
   if (!Object.keys(changes).length) { return; }
   var options = parseConfigurationResponse(getOptions());
   Object.keys(changes).forEach(function(key) { options[key] = changes[key]; });
+  if (changes.vibrate_theme === true) { options.music_enabled = false; }
+  else if (changes.music_enabled === true) { options.vibrate_theme = false; }
+  options = validOptions(options);
   var serialized = JSON.stringify(options);
   try { localStorage.setItem(OPTIONS_STORAGE_KEY, serialized); }
   catch (error) { console.log("Unable to store PebbleEye settings."); }

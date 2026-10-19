@@ -5,6 +5,14 @@
 #include "../src/main.c"
 #undef main
 
+static unsigned audio_triggers, vibe_triggers;
+static void (*gesture_action)(void);
+static bool gesture_light;
+void gentle_gesture_set_enabled(void (*handler)(void)) { gesture_action = handler; }
+void gentle_gesture_set_light(bool on) { gesture_light = on; }
+void gentle_gesture_deinit(void) { gesture_action = NULL; gesture_light = false; }
+void theme_audio_trigger(void) { ++audio_triggers; }
+void theme_vibes_trigger(void) { ++vibe_triggers; }
 static bool vibes_enabled;
 void theme_vibes_set_enabled(bool enabled) { vibes_enabled = enabled; }
 void theme_vibes_deinit(void) { vibes_enabled = false; }
@@ -62,6 +70,7 @@ void backlight_service_unsubscribe(void) {}
 void app_event_loop(void) {}
 
 static void reset(void) {
+  gesture_action = NULL; gesture_light = false; audio_triggers = vibe_triggers = 0;
   window = NULL; face = NULL; subscribed_units = 0; backlight_on = false;
   memset(saved, 0, sizeof(saved)); memset(saved_bool, 0, sizeof(saved_bool)); memset(saved_int, 0, sizeof(saved_int));
   initial_light = fail_window = fail_face = false;
@@ -138,7 +147,28 @@ static void test_allocation_failures(void) {
   deinit(); assert(!face && destroyed_windows == 1 && destroyed_faces == 0);
 }
 
+static void test_exclusive_gesture_actions(void) {
+  reset(); initial_light = true;
+  saved[18] = saved_bool[18] = saved[19] = saved_bool[19] = true;
+  init();
+  assert(gesture_light && gesture_action && !audio_enabled && vibes_enabled);
+  assert(!settings.music_enabled && settings.vibrate_theme && !saved_bool[18]);
+  gesture_action(); assert(vibe_triggers == 1 && audio_triggers == 0);
+  send_value(19, 0); assert(!gesture_action);
+  send_value(18, 1);
+#if defined(PBL_PLATFORM_GABBRO)
+  assert(!gesture_action);
+#else
+  assert(gesture_action); gesture_action(); assert(audio_triggers == 1);
+#endif
+  send_value(19, 1); assert(!audio_enabled && vibes_enabled && !saved_bool[18]);
+  gesture_action(); assert(vibe_triggers == 2);
+  backlight_changed(false); assert(!gesture_light);
+  deinit(); assert(!gesture_action);
+}
+
 int main(void) {
+  test_exclusive_gesture_actions();
   test_initial_settings_and_tick_policy();
   test_batch_validation_and_persistence();
   test_allocation_failures();

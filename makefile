@@ -18,6 +18,12 @@ test:
 	./build/theme_vibes_test
 	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_EMERY -Itests/stubs -Isrc tests/theme_vibes_test.c -o build/theme_vibes_emery_test
 	./build/theme_vibes_emery_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -DPBL_PLATFORM_GABBRO -Itests/stubs -Isrc tests/runtime_test.c src/settings.c -o build/runtime_gabbro_test
+	./build/runtime_gabbro_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -Isrc tests/gentle_tap_test.c -o build/gentle_tap_test
+	./build/gentle_tap_test
+	$(CC) -std=c99 -Wall -Wextra -Werror -Itests/gentle_gesture_stubs -Isrc tests/gentle_gesture_test.c -o build/gentle_gesture_test
+	./build/gentle_gesture_test
 	node --test tests/configuration_test.js
 	$(CC) -std=c99 -Wall -Wextra -Werror -Itests/smooth_font_stubs -Isrc tests/smooth_font_renderer_test.c -o build/smooth_font_renderer_test
 	./build/smooth_font_renderer_test

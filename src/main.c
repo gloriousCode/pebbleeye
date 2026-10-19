@@ -3,12 +3,34 @@
 #include "spy_face.h"
 #include "theme_audio.h"
 #include "theme_vibes.h"
+#include "gentle_gesture.h"
 
 static Window *window;
 static Layer *face;
 static Settings settings;
 static TimeUnits subscribed_units;
 static bool backlight_on;
+
+static void theme_gesture(void) {
+  if (settings.vibrate_theme) theme_vibes_trigger();
+  else if (settings.music_enabled) theme_audio_trigger();
+}
+
+static void configure_theme_gesture(void) {
+  // Existing configurations could contain both flags. Prefer the silent mode.
+  if (settings.music_enabled && settings.vibrate_theme) {
+    settings.music_enabled = false;
+    persist_write_bool(18, false);
+  }
+  theme_audio_set_enabled(settings.music_enabled);
+  theme_vibes_set_enabled(settings.vibrate_theme);
+#if defined(PBL_PLATFORM_GABBRO)
+  bool wanted = settings.vibrate_theme;
+#else
+  bool wanted = settings.music_enabled || settings.vibrate_theme;
+#endif
+  gentle_gesture_set_enabled(wanted ? theme_gesture : NULL);
+}
 
 static void tick(struct tm *now, TimeUnits units);
 
@@ -59,6 +81,7 @@ static void connection_changed(bool connected) {
 
 static void backlight_changed(bool on) {
   backlight_on = on;
+  gentle_gesture_set_light(on);
   update_tick_subscription();
   refresh();
 }
@@ -76,8 +99,7 @@ static void receive_settings(DictionaryIterator *iterator, void *context) {
       }
     }
   }
-  theme_audio_set_enabled(settings.music_enabled);
-  theme_vibes_set_enabled(settings.vibrate_theme);
+  configure_theme_gesture();
   update_tick_subscription();
   refresh();
 }
@@ -115,6 +137,7 @@ static void init(void) {
     }
   }
   backlight_on = light_is_on();
+  gentle_gesture_set_light(backlight_on);
   window = window_create();
   if (!window) return;
   window_set_background_color(window, GColorBlack);
@@ -127,12 +150,12 @@ static void init(void) {
   battery_state_service_subscribe(battery_changed);
   bluetooth_connection_service_subscribe(connection_changed);
   backlight_service_subscribe(backlight_changed);
-  theme_audio_set_enabled(settings.music_enabled);
-  theme_vibes_set_enabled(settings.vibrate_theme);
+  configure_theme_gesture();
   update_tick_subscription();
 }
 
 static void deinit(void) {
+  gentle_gesture_deinit();
   theme_audio_deinit();
   theme_vibes_deinit();
   tick_timer_service_unsubscribe();

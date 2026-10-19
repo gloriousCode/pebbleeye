@@ -1,13 +1,13 @@
 #include <pebble.h>
 #include "theme_vibes.h"
 
-#if defined(PBL_PLATFORM_GABBRO)
+#if defined(PBL_PLATFORM_GABBRO) || defined(PBL_PLATFORM_EMERY)
 enum { PATTERN_MS = 3000, COOLDOWN_MS = 400, CHECK_MS = 100 };
 // Approximate onset rhythm from the approved clip, shifted to start at zero.
 // Alternating pulses/rests preserve the longer 600/640 ms pauses; this is not pitch transcription.
 static const uint32_t rhythm[] = {100, 280, 80, 100, 80, 300, 160, 600, 120, 240, 120, 640, 180};
-static bool enabled, active, waiting_tap, cooling;
-static uint32_t first_tap_ms, elapsed_ms, cooldown_started_ms;
+static bool enabled, active, cooling;
+static uint32_t elapsed_ms, cooldown_started_ms;
 static AppTimer *timer;
 
 static uint32_t milliseconds_now(void) {
@@ -50,22 +50,13 @@ static void monitor(void *context) {
   if (!timer) stop_owned_pattern();
 }
 
-static void tap(AccelAxisType axis, int32_t direction) {
-  (void)axis; (void)direction;
+void theme_vibes_trigger(void) {
   if (!enabled || active) return;
   uint32_t now = milliseconds_now();
   if (cooling) {
     if (now - cooldown_started_ms < COOLDOWN_MS) return;
     cooling = false;
   }
-  uint32_t elapsed = now - first_tap_ms;
-  if (!waiting_tap || elapsed > 500) {
-    waiting_tap = true;
-    first_tap_ms = now;
-    return;
-  }
-  if (elapsed < 100) return;
-  waiting_tap = false;
   if (quiet_time_is_active()) return;
   active = true;
   elapsed_ms = 0;
@@ -78,11 +69,7 @@ static void tap(AccelAxisType axis, int32_t direction) {
 void theme_vibes_set_enabled(bool requested) {
   if (enabled == requested) return;
   enabled = requested;
-  waiting_tap = false;
-  if (enabled) {
-    accel_tap_service_subscribe(tap);
-  } else {
-    accel_tap_service_unsubscribe();
+  if (!enabled) {
     stop_owned_pattern();
     cooling = false;
   }
@@ -92,6 +79,7 @@ void theme_vibes_deinit(void) {
   theme_vibes_set_enabled(false);
 }
 #else
+void theme_vibes_trigger(void) {}
 void theme_vibes_set_enabled(bool enabled) { (void)enabled; }
 void theme_vibes_deinit(void) {}
 #endif
