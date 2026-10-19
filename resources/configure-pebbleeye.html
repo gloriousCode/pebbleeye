@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark">
 <title>PebbleEye settings</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#101713;color:#eef7ef;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:600px;margin:auto;padding:24px 20px 0}h1{font-size:32px;letter-spacing:-1px;margin:0}h2{font-size:19px;margin:0 0 16px}p{color:#b9c9bd;margin:8px 0 20px}.eyebrow{font:12px monospace;letter-spacing:2px;color:#aaffaa;margin:0 0 8px}.card{background:#1a251e;border:1px solid #354b3b;border-radius:18px;padding:20px;margin:20px 0}label{display:block;font-weight:600;margin-bottom:8px}select,button{font:inherit;min-height:48px;border-radius:10px;border:1px solid #58735e;padding:10px 12px}select{width:100%;background:#101713;color:#eef7ef;margin-bottom:8px}small{display:block;color:#b9c9bd;font-size:14px}.field+.field{margin-top:24px}.toggle{display:flex;gap:12px;align-items:flex-start;min-height:48px;cursor:pointer}.toggle input{width:24px;height:24px;flex-shrink:0;accent-color:#aaffaa;margin:2px 0}.toggle small{font-weight:400;margin-top:4px}.actions{position:sticky;bottom:0;background:#101713;padding:16px 0;padding-bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:12px}.actions button{flex:1;background:transparent;color:#eef7ef}.actions button[type=submit]{background:#aaffaa;color:#102515;border-color:#aaffaa;font-weight:700}:focus-visible{outline:3px solid #ffffaa;outline-offset:4px}#preview{display:block;width:200px;height:200px;margin:auto}#preview-caption{text-align:center;font-size:13px;margin:12px 0 0}.preview-card{background:#050805}#edit-status{font-size:14px;min-height:21px;margin:0;color:#aaffaa}button:disabled{opacity:.5}#undo{background:none;border:0;padding:0;color:#aaffaa;text-decoration:underline;min-height:44px} .muted{opacity:.6}
+*{box-sizing:border-box}body{margin:0;background:#101713;color:#eef7ef;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:600px;margin:auto;padding:24px 20px 0}h1{font-size:32px;letter-spacing:-1px;margin:0}h2{font-size:19px;margin:0 0 16px}p{color:#b9c9bd;margin:8px 0 20px}.eyebrow{font:12px monospace;letter-spacing:2px;color:#aaffaa;margin:0 0 8px}.card{background:#1a251e;border:1px solid #354b3b;border-radius:18px;padding:20px;margin:20px 0}label{display:block;font-weight:600;margin-bottom:8px}select,button{font:inherit;min-height:48px;border-radius:10px;border:1px solid #58735e;padding:10px 12px}select{width:100%;background:#101713;color:#eef7ef;margin-bottom:8px}small{display:block;color:#b9c9bd;font-size:14px}.field+.field{margin-top:24px}.toggle{display:flex;gap:12px;align-items:flex-start;min-height:48px;cursor:pointer}.toggle input{width:24px;height:24px;flex-shrink:0;accent-color:#aaffaa;margin:2px 0}.toggle small{font-weight:400;margin-top:4px}.actions{position:sticky;bottom:0;background:#101713;padding:16px 0;padding-bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:12px}.actions button{flex:1;background:transparent;color:#eef7ef}.actions button[type=submit]{background:#aaffaa;color:#102515;border-color:#aaffaa;font-weight:700}:focus-visible{outline:3px solid #ffffaa;outline-offset:4px}#preview{display:block;width:200px;height:200px;margin:auto}#preview-caption{text-align:center;font-size:13px;margin:12px 0 0}.preview-card{background:#050805}#edit-status{font-size:14px;min-height:21px;margin:0;color:#aaffaa}button:disabled{opacity:.5}#undo{background:none;border:0;padding:0;color:#aaffaa;text-decoration:underline;min-height:44px} .muted{opacity:.6}#music-test-section{margin-top:20px}#test-music{background:#aaffaa;color:#102515;font-weight:700;margin-bottom:8px}
 </style>
 </head>
 <body><main>
@@ -38,6 +38,7 @@
 <label class="toggle" for="music_enabled"><input id="music_enabled" name="music_enabled" type="checkbox"><span>Tap music (Time 2 only)<small>Play the 12-second theme. Respects mute and Quiet Time. Selecting music switches vibration off. Round 2 has no speaker.</small></span></label>
 <label class="toggle" for="vibrate_theme"><input id="vibrate_theme" name="vibrate_theme" type="checkbox"><span>Vibrate theme (Time 2 and Round 2)<small>Play a short rhythmic vibration. Off by default and respects Quiet Time. Selecting vibration switches music off. Plays a rhythm, not a melody.</small></span></label>
 <label class="toggle" for="show_status"><input id="show_status" name="show_status" type="checkbox" checked><span>Watch status<small>Show battery and phone connection information.</small></span></label>
+<div id="music-test-section" hidden><button id="test-music" type="button" disabled aria-describedby="music-test-help">Save &amp; test music</button><small id="music-test-help">Switches Time 2 to music, turns vibration off, saves these settings and closes this page to play the 12-second clip once. Respects mute and Quiet Time. Round 2 has no speaker.</small></div>
 </section>
 <p id="edit-status" role="status" aria-live="polite">Settings ready.</p>
 <button id="undo" type="button" disabled>Undo changes</button>
@@ -108,6 +109,24 @@ function refreshPreview() {
   document.getElementById("edit-status").textContent = changed ? "Unsaved changes" : "Settings ready.";
   document.getElementById("undo").disabled = !changed;
 }
+function supportsMusicTest() {
+  if (!/(?:\?|&)platform=emery(?:&|$)/.test(window.location.search || "")) { return false; }
+  var match = /(?:\?|&)v=(\d+)\.(\d+)\.(\d+)(?:&|$)/.exec(window.location.search || "");
+  if (!match) { return false; }
+  var major = Number(match[1]), minor = Number(match[2]), patch = Number(match[3]);
+  return major > 1 || (major === 1 && (minor > 6 || (minor === 6 && patch >= 4)));
+}
+var canTestMusic = supportsMusicTest();
+document.getElementById("music-test-section").hidden = !canTestMusic;
+document.getElementById("test-music").disabled = !canTestMusic;
+document.getElementById("test-music").addEventListener("click", function() {
+  if (!canTestMusic) { return; }
+  var options = readOptions();
+  options.music_enabled = true;
+  options.vibrate_theme = false;
+  options.test_music = true;
+  document.location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(options));
+});
 var initialOptions = loadOptions();
 restoreOptions(initialOptions);
 document.getElementById("config").addEventListener("change", function(event) {

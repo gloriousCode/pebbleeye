@@ -8,6 +8,8 @@
 static unsigned audio_triggers, vibe_triggers;
 static void (*gesture_action)(void);
 static bool gesture_light;
+static unsigned gesture_pauses;
+void gentle_gesture_pause(void) { ++gesture_pauses; }
 void gentle_gesture_set_enabled(void (*handler)(void)) { gesture_action = handler; }
 void gentle_gesture_set_light(bool on) { gesture_light = on; }
 void gentle_gesture_deinit(void) { gesture_action = NULL; gesture_light = false; }
@@ -70,6 +72,7 @@ void backlight_service_unsubscribe(void) {}
 void app_event_loop(void) {}
 
 static void reset(void) {
+  last_music_test = 0; gesture_pauses = 0;
   gesture_action = NULL; gesture_light = false; audio_triggers = vibe_triggers = 0;
   window = NULL; face = NULL; subscribed_units = 0; backlight_on = false;
   memset(saved, 0, sizeof(saved)); memset(saved_bool, 0, sizeof(saved_bool)); memset(saved_int, 0, sizeof(saved_int));
@@ -167,7 +170,38 @@ static void test_exclusive_gesture_actions(void) {
   deinit(); assert(!gesture_action);
 }
 
+static void test_transient_music_command(void) {
+  reset(); init();
+  send_value(20, 123); assert(!audio_triggers && !gesture_pauses);
+  send_value(18, 1);
+  send_value(20, 124); assert(audio_triggers == 1 && gesture_pauses == 1);
+  send_value(20, 124); assert(audio_triggers == 1);
+  send_value(20, 0); send_value(20, -1); assert(audio_triggers == 1);
+  TupleValue token = {.uint32 = UINT32_MAX};
+  Tuple tuple = {.key = 20, .type = TUPLE_UINT, .length = 4, .value = &token};
+  DictionaryIterator it = {.tuples = &tuple, .count = 1};
+  receive_settings(&it, NULL); assert(audio_triggers == 1);
+  token.int32 = 125; tuple.type = TUPLE_CSTRING;
+  receive_settings(&it, NULL); assert(audio_triggers == 1);
+  tuple.type = TUPLE_INT; tuple.length = 1;
+  receive_settings(&it, NULL); assert(audio_triggers == 1);
+  tuple.length = 4; receive_settings(&it, NULL); assert(audio_triggers == 2);
+  assert(bool_writes == 1 && int_writes == 0);
+  send_value(18, 0);
+  TupleValue batch_values[3] = {{.int32 = 126}, {.int32 = 1}, {.int32 = 0}};
+  Tuple batch[3] = {
+    {.key = 20, .type = TUPLE_INT, .length = 4, .value = &batch_values[0]},
+    {.key = 18, .type = TUPLE_INT, .length = 4, .value = &batch_values[1]},
+    {.key = 19, .type = TUPLE_INT, .length = 4, .value = &batch_values[2]}
+  };
+  it = (DictionaryIterator){.tuples = batch, .count = 3};
+  receive_settings(&it, NULL); assert(audio_enabled && audio_triggers == 3);
+  receive_settings(&it, NULL); assert(audio_triggers == 3);
+  deinit();
+}
+
 int main(void) {
+  test_transient_music_command();
   test_exclusive_gesture_actions();
   test_initial_settings_and_tick_policy();
   test_batch_validation_and_persistence();

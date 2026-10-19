@@ -17,10 +17,10 @@ AppTimer *app_timer_register(uint32_t ms, void (*callback)(void *), void *contex
   return &fake_timer;
 }
 void accel_data_service_subscribe(uint32_t count, void (*callback)(AccelData *, uint32_t)) {
-  assert(count == 5 && !sample_handler); sample_handler = callback; ++subscriptions;
+  assert(count == 10 && !sample_handler); sample_handler = callback; ++subscriptions;
 }
 void accel_data_service_unsubscribe(void) { assert(sample_handler); sample_handler = NULL; }
-int accel_service_set_sampling_rate(int rate) { assert(rate == 50); return fail_rate ? -1 : 0; }
+int accel_service_set_sampling_rate(int rate) { assert(rate == 100); return fail_rate ? -1 : 0; }
 static void action(void) { assert(!sample_handler && !timer_handler); ++actions; }
 static void feed(int16_t x) {
   AccelData data = {.x = x, .z = 1000, .timestamp = (now += 20)};
@@ -32,11 +32,29 @@ static void reset(void) {
   subscriptions = actions = 0; now = 0; fail_timer = fail_rate = false;
 }
 
+static void test_batched_100hz_samples(void) {
+  reset(); gentle_gesture_set_light(true); gentle_gesture_set_enabled(action);
+  for (int batch = 0; batch < 5; ++batch) {
+    AccelData data[10];
+    for (int i = 0; i < 10; ++i) {
+      int index = batch * 10 + i;
+      int phase = index >= 36 ? index - 36 : index - 12;
+      int16_t x = phase == 0 ? 200 : phase == 1 ? -100 : phase == 2 ? 60 : 0;
+      data[i] = (AccelData){.x = x, .z = 1000, .timestamp = (uint64_t)(index + 1) * 10};
+    }
+    assert(sample_handler); sample_handler(data, 10);
+    assert(actions == (batch == 4 ? 1u : 0u));
+  }
+  assert(!sample_handler && !timer_handler);
+  reset();
+}
+
 int main(void) {
+  test_batched_100hz_samples();
   reset(); gentle_gesture_set_enabled(action); assert(!sample_handler && !timer_handler);
   gentle_gesture_set_light(true); assert(subscriptions == 1 && sample_handler && timer_handler);
   gentle_gesture_set_enabled(action); gentle_gesture_set_light(true); assert(subscriptions == 1);
-  quiet(5); feed(200); quiet(5); feed(200); quiet(3);
+  quiet(5); feed(200); quiet(7); feed(200); quiet(5);
   assert(actions == 1 && !sample_handler && !timer_handler);
   gentle_gesture_set_light(true); gentle_gesture_set_enabled(action); assert(!sample_handler);
   gentle_gesture_set_light(false); gentle_gesture_set_light(true); assert(subscriptions == 2);
@@ -51,6 +69,10 @@ int main(void) {
   assert(!sample_handler && !timer_handler);
   reset(); gentle_gesture_set_light(true); fail_rate = true; gentle_gesture_set_enabled(action);
   assert(!sample_handler && !timer_handler);
-  reset(); gentle_gesture_set_light(true); gentle_gesture_set_enabled(action); reset();
+  reset(); gentle_gesture_set_light(true); gentle_gesture_set_enabled(action);
+  gentle_gesture_pause(); assert(!sample_handler && !timer_handler);
+  gentle_gesture_set_light(true); assert(!sample_handler);
+  gentle_gesture_set_light(false); gentle_gesture_set_light(true); assert(sample_handler);
+  reset();
   puts("Gentle gesture idle, window, one-shot, disable and failure lifecycle tests passed");
 }

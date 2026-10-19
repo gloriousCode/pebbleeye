@@ -33,8 +33,8 @@ Orchid, Lagoon, Ember, Silver and Rose.
 
 This is a separate app from Wordish. Its existing experimental UUID
 `ec7e38a9-3852-4459-9265-597ebcfb678f` is preserved, along with the
-`gabbroeye-hud-options-v1` phone storage key. The standalone release is **1.6.3**,
-version code **20**, advancing the branch's 1.5.1. Older Pebble models are not supported.
+`gabbroeye-hud-options-v1` phone storage key. The standalone release is **1.6.4**,
+version code **21**, advancing the branch's 1.5.1. Older Pebble models are not supported.
 
 ## Build and verify
 
@@ -101,7 +101,7 @@ seconds. Time 2 offers either **Double-tap music** or **Vibrate theme**; enablin
 one switches the other off. Both may be off. Round 2 supports vibration only.
 Old configurations containing both flags migrate to vibration.
 
-The shared detector samples at 50 Hz in batches of five only while the backlight
+The shared detector samples at 100 Hz in batches of ten only while the backlight
 is lit, for up to eight seconds. It stops after one recognised gesture, when the
 light goes out, or when disabled. Wake the light again to repeat. There is no
 idle accelerometer subscription or polling timer. The recogniser rejects
@@ -114,3 +114,19 @@ omits the audio resource. Vibration plays a three-second rhythm on either model
 and respects Quiet Time. It reproduces timing rather than musical pitch.
 Changing mode or disabling an active mode stops its playback. Existing app UUID,
 settings keys and configuration address are preserved.
+
+## Playback test and diagnosis
+
+On Time 2, **Save & test music** selects music, saves the current settings, closes
+configuration and requests one playback without a gesture. The updated hosted
+configuration page must be published for this control to appear. It is hidden
+on Round 2 and older watchface builds. Normal saves, message retries and phone
+reconnects do not replay the test. Mute and Quiet Time still apply.
+
+Version 1.6.4 replaces the previous exact-position/80 ms settling rule with a
+longer timestamp-based impulse filter. It tolerates modest orientation changes
+and ringing. Faster sampling stays bounded to the same backlight window and
+uses ten-sample batches, keeping callback frequency at ten per second. This
+increases sensor work during those windows; actual battery impact is unmeasured.
+App logs record window start/end, whether samples arrive, recognised gestures
+and blocked speaker requests. Physical-watch confirmation remains required.

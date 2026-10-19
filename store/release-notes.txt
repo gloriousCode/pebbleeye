@@ -1,4 +1,4 @@
-PebbleEye 1.6.3
+PebbleEye 1.6.4
 
 Gentle double taps now use sampled acceleration during a short backlight window.
 Wake the light, hold your wrist still and tap twice within eight seconds.
@@ -12,3 +12,8 @@ vibration and omits the audio resource. Mute and Quiet Time are respected.
 Native builds and synthetic gesture/lifecycle tests pass. Physical sensitivity
 and battery impact still need measurement on watches. Store images are unchanged
 because this release changes interaction rather than the rendered face.
+
+This update relaxes an overly strict tap-settling filter and uses 100 Hz sampling
+in ten-sample batches during the existing short window. Time 2 settings add
+Save & test music to check playback independently of gestures. The new settings
+page must be published along with this version. Physical confirmation is pending.

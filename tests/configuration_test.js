@@ -11,12 +11,12 @@ function bridge(stored = '{}') {
   let storage = stored;
   const context = vm.createContext({console: {log() {}}, setTimeout: callback => timers.push(callback),
     localStorage: {getItem: () => storage, setItem: (key, value) => {assert.equal(key, 'gabbroeye-hud-options-v1'); storage = value;}},
-    Pebble: {addEventListener: (name, callback) => {handlers[name] = callback;}, openURL: url => urls.push(url),
+    Pebble: {getActiveWatchInfo: () => ({platform:"emery"}), addEventListener: (name, callback) => {handlers[name] = callback;}, openURL: url => urls.push(url),
       sendAppMessage: (settings, success, failure) => messages.push({settings: plain(settings), success, failure})}});
   vm.runInContext(fs.readFileSync(path.join(root, 'src/js/pebble-js-app.js'), 'utf8'), context);
   return {context, handlers, messages, timers, urls, stored: () => JSON.parse(storage)};
 }
-function editor(options, hash) {
+function editor(options, hash, search = "?v=1.6.4&platform=emery") {
   const html = fs.readFileSync(path.join(root, 'resources/configure-pebbleeye.html'), 'utf8');
   const nodes = {};
   for (const match of html.matchAll(/id="([^"]+)"/g)) {
@@ -25,7 +25,7 @@ function editor(options, hash) {
       setAttribute(name, value) {this.attributes[name] = value;}, addEventListener(name, callback) {this.handlers[name] = callback;}};
   }
   const document = {getElementById: id => {assert.ok(nodes[id], id); return nodes[id];}, location: ''};
-  const context = vm.createContext({document, window: {location: {hash: hash === undefined ? '#options=' + encodeURIComponent(JSON.stringify(options)) : hash}}});
+  const context = vm.createContext({document, window: {location: {search, hash: hash === undefined ? '#options=' + encodeURIComponent(JSON.stringify(options)) : hash}}});
   vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
   return {context, nodes, document};
 }
@@ -55,7 +55,8 @@ test('configuration opens the standalone versioned page with migrated options', 
   const b = bridge('{"display_mode":"analogue"}'); b.handlers.showConfiguration();
   const url = new URL(b.urls[0]);
   assert.equal(url.origin + url.pathname, 'https://gloriouscode.github.io/pebbleeye/resources/configure-pebbleeye.html');
-  assert.equal(url.searchParams.get('v'), '1.6.3');
+  assert.equal(url.searchParams.get('v'), '1.6.4');
+  assert.equal(url.searchParams.get('platform'), 'emery');
   assert.deepEqual(JSON.parse(decodeURIComponent(url.hash.slice(9))), {display_mode:'analogue'});
 });
 test('failed delivery stops after three attempts', () => {
@@ -271,4 +272,88 @@ test('partial action changes replace the previous action and legacy conflicts pr
   const e = editor({music_enabled:true,vibrate_theme:true});
   assert.equal(e.nodes.music_enabled.checked, false);
   assert.equal(e.nodes.vibrate_theme.checked, true);
+});
+
+test('Save and test music explicitly selects music but never persists the playback command', () => {
+  const e = editor({theme:'rose',music_enabled:false,vibrate_theme:true});
+  assert.equal(e.document.location, '');
+  assert.equal(e.nodes['test-music'].disabled, false);
+  assert.equal(e.nodes['music-test-section'].hidden, false);
+  e.nodes['test-music'].handlers.click();
+  const response = e.document.location.split('#')[1];
+  const b = bridge(); b.handlers.webviewclosed({response});
+  assert.equal(b.stored().theme, 'rose');
+  assert.equal(b.stored().music_enabled, true);
+  assert.equal(b.stored().vibrate_theme, false);
+  assert.equal('test_music' in b.stored(), false);
+  const token = b.messages[0].settings['20'];
+  assert.ok(Number.isInteger(token) && token > 0 && token <= 2147483647);
+  assert.equal(b.messages[0].settings['18'], 1);
+  b.messages[0].success(); b.handlers.ready();
+  assert.equal('20' in b.messages[1].settings, false);
+  b.messages[1].success();
+  b.handlers.webviewclosed({response:'{"theme":"ice"}'});
+  assert.equal('20' in b.messages[2].settings, false);
+  assert.equal(b.stored().vibrate_theme, false);
+});
+test('music test retries reuse their token and separate requests get monotonic tokens', () => {
+  const b = bridge();
+  b.context.Date = {now: () => 1000};
+  b.handlers.webviewclosed({response:'{"test_music":true}'});
+  assert.equal(b.messages[0].settings['20'], 1000);
+  b.messages[0].failure(); b.timers.shift()();
+  assert.equal(b.messages[1].settings['20'], 1000);
+  b.messages[1].success();
+  b.context.Date.now = () => 900;
+  b.handlers.webviewclosed({response:'{"test_music":true}'});
+  assert.equal(b.messages[2].settings['20'], 1001);
+  b.messages[2].success();
+  b.context.lastMusicTestToken = 2147483647;
+  b.handlers.webviewclosed({response:'{"test_music":true}'});
+  assert.equal(b.messages[3].settings['20'], 1);
+});
+test('invalid test requests and stored flags never trigger music', () => {
+  for (const test_music of [false,'true',1,null,{},[]]) {
+    const b = bridge();
+    b.handlers.webviewclosed({response:JSON.stringify({test_music})});
+    assert.equal(b.messages.length, 0);
+    b.handlers.webviewclosed({response:JSON.stringify({theme:'amber',test_music})});
+    assert.equal('20' in b.messages[0].settings, false);
+    assert.equal('test_music' in b.stored(), false);
+  }
+  const b = bridge('{"test_music":true,"music_enabled":false}'); b.handlers.ready();
+  assert.equal('20' in b.messages[0].settings, false);
+});
+test('music test control requires a compatible version query and cancel is harmless', () => {
+  for (const search of ['', '?v=1.6.4', '?v=1.6.4&platform=gabbro', '?v=1.6.4&platform=emeryjunk', '?v=1.6.3&platform=emery', '?v=1.5.99&platform=emery', '?v=broken&platform=emery', '?v=1.6.4junk&platform=emery']) {
+    const e = editor({}, undefined, search);
+    assert.equal(e.nodes['test-music'].disabled, true);
+    assert.equal(e.nodes['music-test-section'].hidden, true);
+    e.nodes['test-music'].handlers.click(); assert.equal(e.document.location, '');
+  }
+  for (const search of ['?v=1.6.4&platform=emery', '?v=1.6.10&platform=emery', '?v=1.7.0&platform=emery', '?v=2.0.0&platform=emery']) {
+    const e = editor({}, undefined, search);
+    assert.equal(e.nodes['test-music'].disabled, false);
+    e.nodes.cancel.handlers.click();
+    const b = bridge(); b.handlers.webviewclosed({response:e.document.location.split('#')[1]});
+    assert.equal(b.messages.length, 0);
+    e.nodes.config.handlers.submit({preventDefault(){}});
+    assert.equal('test_music' in JSON.parse(decodeURIComponent(e.document.location.split('#')[1])), false);
+  }
+});
+
+test('configuration platform detection hides the music test safely without a Time 2', () => {
+  for (const info of [{platform:'gabbro'}, {platform:'emery'}, {platform:'unknown'}, null]) {
+    const b = bridge(); b.context.Pebble.getActiveWatchInfo = () => info;
+    b.handlers.showConfiguration();
+    const url = new URL(b.urls[0]);
+    const e = editor({}, undefined, url.search);
+    assert.equal(e.nodes['test-music'].disabled, !info || info.platform !== 'emery');
+  }
+  for (const getter of [undefined, () => {throw Error('unsupported');}]) {
+    const b = bridge(); b.context.Pebble.getActiveWatchInfo = getter;
+    assert.doesNotThrow(() => b.handlers.showConfiguration());
+    const e = editor({}, undefined, new URL(b.urls[0]).search);
+    assert.equal(e.nodes['music-test-section'].hidden, true);
+  }
 });

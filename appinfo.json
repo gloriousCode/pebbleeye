@@ -6,7 +6,8 @@
     "THEME": 16,
     "SHOW_STATUS": 17,
     "MUSIC_ENABLED": 18,
-    "VIBRATE_THEME": 19
+    "VIBRATE_THEME": 19,
+    "TEST_MUSIC": 20
   },
   "capabilities": [
     "configurable"
@@ -93,8 +94,8 @@
     "gabbro"
   ],
   "uuid": "ec7e38a9-3852-4459-9265-597ebcfb678f",
-  "versionCode": 20,
-  "versionLabel": "1.6.3",
+  "versionCode": 21,
+  "versionLabel": "1.6.4",
   "watchapp": {
     "watchface": true
   }

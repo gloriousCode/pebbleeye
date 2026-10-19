@@ -1,4 +1,4 @@
-var VERSION = "1.6.3";
+var VERSION = "1.6.4";
 var OPTIONS_STORAGE_KEY = "gabbroeye-hud-options-v1";
 var CONFIG_URL = "https://gloriouscode.github.io/pebbleeye/resources/configure-pebbleeye.html";
 var dateFormats = {dd_mm_yy: 0, mm_dd_yyyy: 1, mon_d_aug: 2, dd_slash_mm: 3, mm_slash_dd: 4};
@@ -7,6 +7,7 @@ var themes = {classic: 0, amber: 1, ice: 2, orchid: 3, lagoon: 4, ember: 5, silv
 var pendingConfiguration = null;
 var deliveringConfiguration = false;
 var configurationGeneration = 0;
+var lastMusicTestToken = 0;
 
 function parseConfigurationResponse(response) {
   if (typeof response !== "string" || !response || response === "CANCELLED") { return {}; }
@@ -82,8 +83,10 @@ function deliverPendingConfiguration() {
 }
 
 function webviewclosed(event) {
-  var changes = validOptions(parseConfigurationResponse(event && event.response));
-  if (!Object.keys(changes).length) { return; }
+  var response = parseConfigurationResponse(event && event.response);
+  var changes = validOptions(response);
+  var testMusic = response.test_music === true;
+  if (!Object.keys(changes).length && !testMusic) { return; }
   var options = parseConfigurationResponse(getOptions());
   Object.keys(changes).forEach(function(key) { options[key] = changes[key]; });
   if (changes.vibrate_theme === true) { options.music_enabled = false; }
@@ -92,11 +95,23 @@ function webviewclosed(event) {
   var serialized = JSON.stringify(options);
   try { localStorage.setItem(OPTIONS_STORAGE_KEY, serialized); }
   catch (error) { console.log("Unable to store PebbleEye settings."); }
-  transmitConfiguration(prepareConfiguration(serialized));
+  var settings = prepareConfiguration(serialized);
+  if (testMusic) {
+    var clockToken = Date.now() % 2147483647;
+    lastMusicTestToken = Math.max(lastMusicTestToken + 1, clockToken);
+    if (lastMusicTestToken > 2147483647) { lastMusicTestToken = 1; }
+    settings["20"] = lastMusicTestToken;
+  }
+  transmitConfiguration(settings);
 }
 
 Pebble.addEventListener("ready", function() { transmitConfiguration(prepareConfiguration(getOptions())); });
 Pebble.addEventListener("showConfiguration", function() {
-  Pebble.openURL(CONFIG_URL + "?v=" + encodeURIComponent(VERSION) + "#options=" + encodeURIComponent(getOptions()));
+  var platform = "";
+  try {
+    var watch = Pebble.getActiveWatchInfo();
+    if (watch && (watch.platform === "emery" || watch.platform === "gabbro")) { platform = watch.platform; }
+  } catch (error) { console.log("Watch platform unavailable; music test control will be hidden."); }
+  Pebble.openURL(CONFIG_URL + "?v=" + encodeURIComponent(VERSION) + "&platform=" + encodeURIComponent(platform) + "#options=" + encodeURIComponent(getOptions()));
 });
 Pebble.addEventListener("webviewclosed", webviewclosed);

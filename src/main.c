@@ -10,6 +10,7 @@ static Layer *face;
 static Settings settings;
 static TimeUnits subscribed_units;
 static bool backlight_on;
+static int32_t last_music_test;
 
 static void theme_gesture(void) {
   if (settings.vibrate_theme) theme_vibes_trigger();
@@ -88,9 +89,14 @@ static void backlight_changed(bool on) {
 
 static void receive_settings(DictionaryIterator *iterator, void *context) {
   (void)context;
+  int32_t music_test = 0;
   for (Tuple *tuple = dict_read_first(iterator); tuple; tuple = dict_read_next(iterator)) {
     if ((tuple->type != TUPLE_INT && tuple->type != TUPLE_UINT) || tuple->length != 4) continue;
     int value = tuple->value->int32;
+    if (tuple->key == 20) {
+      if (value > 0) music_test = value;
+      continue;
+    }
     if (settings_apply(&settings, tuple->key, value)) {
       if (tuple->key == 14 || tuple->key == 17 || tuple->key == 18 || tuple->key == 19) {
         persist_write_bool(tuple->key, value != 0);
@@ -102,6 +108,13 @@ static void receive_settings(DictionaryIterator *iterator, void *context) {
   configure_theme_gesture();
   update_tick_subscription();
   refresh();
+  if (music_test && music_test != last_music_test) {
+    last_music_test = music_test;
+    if (settings.music_enabled) {
+      gentle_gesture_pause();
+      theme_audio_trigger();
+    }
+  }
 }
 
 static void inbox_dropped(AppMessageResult reason, void *context) {

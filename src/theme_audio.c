@@ -65,10 +65,20 @@ static void pump(void *context) {
 
 void theme_audio_trigger(void) {
   if (!enabled || playing) return;
-  if (quiet_time_is_active() || speaker_is_muted() || speaker_get_status() != SpeakerStatusIdle) return;
+  if (quiet_time_is_active() || speaker_is_muted() || speaker_get_status() != SpeakerStatusIdle) {
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Theme blocked: quiet=%d mute=%d status=%d",
+            quiet_time_is_active(), speaker_is_muted(), speaker_get_status());
+    return;
+  }
   resource = resource_get_handle(RESOURCE_ID_THEME_AUDIO);
-  if (!resource || resource_size(resource) != CLIP_BYTES) return;
-  if (!speaker_stream_open(SpeakerPcmFormat_16kHz_8bit, 40)) return;
+  if (!resource || resource_size(resource) != CLIP_BYTES) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Theme resource missing or invalid");
+    return;
+  }
+  if (!speaker_stream_open(SpeakerPcmFormat_16kHz_8bit, 40)) {
+    APP_LOG(APP_LOG_LEVEL_WARNING, "Theme stream open failed");
+    return;
+  }
   playing = true;
   APP_LOG(APP_LOG_LEVEL_INFO, "Theme playback started");
   draining = false;
